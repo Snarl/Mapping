@@ -1,4 +1,4 @@
-var map, listener;
+var map, listener, zones = new Array();
 
 function Zone(){
 
@@ -8,6 +8,10 @@ function Zone(){
 	this.polyPoints = new Array();
 	this.markers = new Array();
 	this.title = "untitled";
+	
+	this.getTitle = function(){
+		return this.title;
+	}
 	
 	this.setTitle = function(t){
 		this.title = t;
@@ -23,7 +27,6 @@ function Zone(){
 			draggable:true, 
 			bouncy:false, 
 			position:pos,
-			dragCrossMove:true
 		});
 		marker.setMap(map);
 		this.markers.push(marker);
@@ -80,9 +83,26 @@ function Zone(){
 		this.markers.length = 0;
 	}
 	
+	this.finishEdit = function() {
+		for(var n = 0; n< this.markers.length; n++){
+			this.markers[n].dragging = false;
+			this.markers[n].draggable = false;
+			this.markers[n].visible = false;
+		}
+	}
+	
+	this.startEdit = function() {
+		for(var n = 0; n< this.markers.length; n++){
+			this.markers[n].draggable = true;
+			this.markers[n].visible = true;
+		}		
+	}
+	
 }
 
 $(document).ready(function(){
+	
+	//Creat the Google Map
 	var $map = $('#map');
 	$map.height($(window).height() - $map.offset().top);
 	map = new google.maps.Map($map[0], {
@@ -90,22 +110,50 @@ $(document).ready(function(){
 		center: new google.maps.LatLng(51.500556, -0.126667),
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	});
+	
+	//Prepare the zone creating button
 	$('#zonedefine').click(function(){
-		$this = $(this);
-		if(!$this.hasClass('inprogress')){
-			var title = prompt("Name your zone");
-			if(title==null){
-				return;
-			}
-			$this.addClass('inprogress');
-			var zone = new Zone();
-			zone.setTitle(title);
-			listener = google.maps.event.addListener(map, "click", function(event){
-					zone.addPoint(event.latLng);
-			});
-		}else{
-			google.maps.event.removeListener(listener);
-			$this.removeClass('inprogress');
-		}
+		startZone();
 	});
+	
 });
+
+function startZone(){
+	
+	$btn = $('#zonedefine');
+	
+	//Get title from user
+	var title = prompt("Name your zone");
+	if(title==null){
+		return false;
+	}
+	var zone = new Zone();
+	zone.setTitle(title);
+	zones.push(zone);
+	
+	//Change the button state
+	$btn.addClass('inprogress').attr("oldtext",$btn.text()).text("Finish defining '"+title+"'").attr("active",title).unbind("click").click(function(){
+			finishZone(zone);
+	});
+	
+	//Prepare the map for defining a zone
+	listener = google.maps.event.addListener(map, "click", function(event){
+			zone.addPoint(event.latLng);
+	});
+	
+}
+
+function finishZone(zone){
+	
+	$btn = $('#zonedefine');
+	
+	//Make the zone static on the map
+	zone.finishEdit();
+	google.maps.event.removeListener(listener);
+	
+	//Change the button state
+	$btn.removeClass('inprogress').text($btn.attr("oldtext")).removeAttr("oldtext").removeAttr("active").unbind("click").click(function(){
+			startZone();
+	});
+	
+}
