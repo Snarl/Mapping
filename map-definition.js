@@ -15,34 +15,33 @@ function Zone(){
 
 	this.addPoint = function(pos) {
 
-		// Icon definition
-		var sq  = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALCAIAAAAmzuBxAAAAB3RJTUUH1wUfFBAj8P8mAQAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAABhJREFUGNNjYGD4Twgx/McDRlVgVYEfAQDP6Bn11lX+1QAAAABJRU5ErkJggg==";
-		//var sqo = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAALCAIAAAAmzuBxAAAABGdBTUEAAFjH/EfgAgAAABtJREFUGNNjkJX9gx8xAPGr589woVEVWFXgRwDu3AxnX5K/ewAAAABJRU5ErkJggg==";
+		var z = this;
 
 		// Make markers
 		var marker = new google.maps.Marker({
-			icon:sq, 
+			icon:'./square.png', 
 			draggable:true, 
 			bouncy:false, 
 			position:pos,
 			dragCrossMove:true
 		});
+		marker.setMap(map);
 		this.markers.push(marker);
 
 		// Add events
 		google.maps.event.addListener(marker, "drag", function() {
-			this.draw();
+			z.draw();
 		});
 
 		google.maps.event.addListener(marker, "click", function() {
-			for(var n = 0; n < this.markers.length; n++) {
-				if(this.markers[n] == marker) {
-					this.markers[n].setMap(null);
+			for(var n = 0; n < z.markers.length; n++) {
+				if(z.markers[n] == marker) {
+					z.markers[n].setMap(null);
 					break;
 				}
 			}
-			this.markers.splice(n, 1);
-			this.draw();
+			z.markers.splice(n, 1);
+			z.draw();
 		});
 
 		this.draw();
@@ -94,15 +93,18 @@ $(document).ready(function(){
 	$('#zonedefine').click(function(){
 		$this = $(this);
 		if(!$this.hasClass('inprogress')){
+			var title = prompt("Name your zone");
+			if(title==null){
+				return;
+			}
 			$this.addClass('inprogress');
-			title = prompt("Name your zone");
 			var zone = new Zone();
 			zone.setTitle(title);
-			listener =  google.maps.event.addListener(map, "click", function(event){
+			listener = google.maps.event.addListener(map, "click", function(event){
 					zone.addPoint(event.latLng);
 			});
 		}else{
-			 google.maps.event.removeListener(listener);
+			google.maps.event.removeListener(listener);
 			$this.removeClass('inprogress');
 		}
 	});

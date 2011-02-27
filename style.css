@@ -1,0 +1,45 @@
+html { height: 100% }
+body { height: 100%; margin: 0px; padding: 0px }
+#map_canvas { height: 100% }
+
+#container {
+	margin: 0 auto;
+	width: 100%;
+	background: #fff;
+}
+
+#header {
+	background: #ccc;
+	padding: 20px;
+}
+
+#header h1 { margin: 0; }
+
+#content {
+	float: left;
+	width: 100%;
+}
+
+#map-container {
+	clear: left;
+	float: left;
+	width: 70%;
+	margin: 0 0 0 0;
+	display: inline;
+}
+
+#map {
+	width: 100%;
+	min-height: 100px;
+}
+
+#tools {
+	float: right;
+	width: 26%;
+	margin: 0 0 0 0;
+	display: inline;
+}
+
+button.inprogress{
+	background-color: red;
+}
