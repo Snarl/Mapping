@@ -21,7 +21,7 @@ function Zone(){
 
 		var z = this;
 
-		// Make markers
+		// Make markersp
 		var marker = new google.maps.Marker({
 			icon:'./square.png', 
 			draggable:true, 
@@ -50,13 +50,18 @@ function Zone(){
 		this.draw();
 	}
 
-/*	this.zoomTo = function() {
+	this.zoomTo = function() {
 		if(this.polyShape && this.polyPoints.length > 0) {
-			var bounds = polyShape.getBounds();
-			map.setCenter(bounds.getCenter());
-			map.setZoom(map.getBoundsZoomLevel(bounds));
+			var Ba = 0; var Da = 0;
+			for(i = 0; i < this.polyPoints.length; i++){
+				Ba += this.polyPoints[i].Ba;
+				Da += this.polyPoints[i].Da;
+			}
+			Ba = Ba / this.polyPoints.length;
+			Da = Da / this.polyPoints.length;
+			map.panTo(new google.maps.LatLng(Ba, Da));
 		}
-	}*/
+	};
 	
 	this.draw = function() {
 		if(this.polyShape){ this.polyShape.setMap(null); }
