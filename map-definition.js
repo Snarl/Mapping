@@ -102,10 +102,22 @@ function Zone(){
 			this.markers[n].visible = true;
 		}		
 	}
+
+	this.save = function(){
+		
+		$.get("api/saveZone.php", {
+			"title": this.title,
+			"coords": this.polyPoints.join(";")
+		}, function(result){
+			alert(result);
+		})
+	}
 	
 }
 
-function populateZones
+function populateZones(){
+
+}
 
 $(document).ready(function(){
 	
@@ -156,6 +168,7 @@ function finishZone(zone){
 	
 	//Make the zone static on the map
 	zone.finishEdit();
+	zone.save();
 	google.maps.event.removeListener(listener);
 	
 	//Change the button state

@@ -1,10 +1,6 @@
 <?php
 
-$settings = array(
-
-	base_dir => '/var/www/maps',
-	data_dir => '/data'
-
-);
+$settings['base_dir'] = "/var/www/maps";
+$settings['data_dir'] = $settings['base_dir'] . "/data";
 
 ?>
