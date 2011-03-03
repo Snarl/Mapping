@@ -105,9 +105,11 @@ function Zone(){
 	
 }
 
+function populateZones
+
 $(document).ready(function(){
 	
-	//Creat the Google Map
+	//Create the Google Map
 	var $map = $('#map');
 	$map.height($(window).height() - $map.offset().top);
 	map = new google.maps.Map($map[0], {
