@@ -49,19 +49,22 @@ function Zone(){
 
 		this.draw();
 	}
-
-	this.zoomTo = function() {
-		if(this.polyShape && this.polyPoints.length > 0) {
-			var Ba = 0; var Da = 0;
-			for(i = 0; i < this.polyPoints.length; i++){
-				Ba += this.polyPoints[i].Ba;
-				Da += this.polyPoints[i].Da;
-			}
-			Ba = Ba / this.polyPoints.length;
-			Da = Da / this.polyPoints.length;
-			map.panTo(new google.maps.LatLng(Ba, Da));
+	
+	this.getBounds = function(){
+		var bounds=new google.maps.LatLngBounds;
+		for(i = 0; i < this.markers.length; i++){
+			bounds.extend(this.markers[i].position);
 		}
+		return bounds;
+	}
+
+	this.panTo = function() {
+		map.panTo(this.getBounds().getCenter());
 	};
+	
+	this.zoomTo = function(){
+		map.fitBounds(this.getBounds());
+	}
 	
 	this.draw = function() {
 		if(this.polyShape){ this.polyShape.setMap(null); }
