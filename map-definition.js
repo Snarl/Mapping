@@ -1,11 +1,12 @@
-var map, listener, zones = new Array();
+var map, listeners, zones = new Array();
 
 function Zone(){
 
-	this.polyShape;
-	this.polyLineColor = "#3355ff";
-	this.polyFillColor = "#335599";
-	this.polyPoints = new Array();
+	this.shape;
+	this.lineColor = "#3355ff";
+	this.fillColor = "#335599";
+	this.endColor = "#ff0000";
+	this.points = new Array();
 	this.markers = new Array();
 	this.title = "untitled";
 	
@@ -50,6 +51,15 @@ function Zone(){
 		this.draw();
 	}
 	
+	this.blendTo = function(to_string, time){
+		from_string = this.shape.fillColor;
+		to = [to_string.substring(1,3),to_string.substring(3,5),to_string.substring(5,7)];
+		from = [from_string.substring(1,3),from_string.substring(3,5),from_string.substring(5,7)];
+		//do it in steps of 50ms
+		steplength = time/50;
+		console.dir(from);
+	}
+	
 	this.getBounds = function(){
 		var bounds=new google.maps.LatLngBounds;
 		for(i = 0; i < this.markers.length; i++){
@@ -67,29 +77,33 @@ function Zone(){
 	}
 	
 	this.draw = function() {
-		if(this.polyShape){ this.polyShape.setMap(null); }
-		this.polyPoints.length = 0;	
+		var z = this;
+		if(this.shape){ this.shape.setMap(null); }
+		this.points.length = 0;	
 		for(i = 0; i < this.markers.length; i++) {
-			this.polyPoints.push(this.markers[i].getPosition());
+			this.points.push(this.markers[i].getPosition());
 		}
-		this.polyShape = new google.maps.Polygon({
-			paths: this.polyPoints, 
-			strokeColor: this.polyLineColor, 
+		this.shape = new google.maps.Polygon({
+			paths: this.points, 
+			strokeColor: this.lineColor, 
 			strokeWeight: 3, 
 			strokeOpacity: .8, 
-			fillColor: this.polyFillColor,
+			fillColor: this.fillColor,
 			fillOpacity: .3
 		});
-		this.polyShape.setMap(map);
+		this.shape.setMap(map);
+		google.maps.event.addListener(this.shape, "click", function(){
+			z.blendTo(z.endColor,1000);
+		});
 	}
 	
 	this.clear = function() {
 		for(var n = 0; n<this.markers.length; n++){
 			this.markers[n].setMap(null)
 		}
-		this.polyPoints.length = 0;
+		this.points.length = 0;
 		this.markers.length = 0;
-	}
+	};
 	
 	this.finishEdit = function() {
 		for(var n = 0; n< this.markers.length; n++){
@@ -97,29 +111,42 @@ function Zone(){
 			this.markers[n].draggable = false;
 			this.markers[n].visible = false;
 		}
-	}
-	
+		//this.fillColor = ;
+	};
+
 	this.startEdit = function() {
 		for(var n = 0; n< this.markers.length; n++){
 			this.markers[n].draggable = true;
 			this.markers[n].visible = true;
 		}		
-	}
+	};
 
 	this.save = function(){
 		
 		$.get("api/saveZone.php", {
 			"title": this.title,
-			"coords": this.polyPoints.join(";")
+			"nodes": this.points.join(";").replace(/ /g,"")
 		}, function(result){
 			alert(result);
-		})
-	}
+		});
+		
+	};
 	
 }
 
-function populateZones(){
-
+function loadZones(){
+	$.getJSON("api/getZones.php",function(data){
+		$.each(data, function(k, v){
+			var zone = new Zone();
+			zone.setTitle(k);
+			nodes = v.nodes.node;
+			for(i = 0;i < nodes.length;i++){
+				zone.addPoint(new google.maps.LatLng(nodes[i].lat,nodes[i].lng));
+			}
+			zone.finishEdit();
+			zones.push(zone);
+		});
+	});
 }
 
 $(document).ready(function(){
@@ -132,6 +159,8 @@ $(document).ready(function(){
 		center: new google.maps.LatLng(51.500556, -0.126667),
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	});
+	
+	loadZones();
 	
 	//Prepare the zone creating button
 	$('#zonedefine').click(function(){
@@ -153,13 +182,13 @@ function startZone(){
 	zone.setTitle(title);
 	zones.push(zone);
 	
-	//Change the button state
+	//Change the button state, make clicking it again finish the zone.
 	$btn.addClass('inprogress').attr("oldtext",$btn.text()).text("Finish defining '"+title+"'").attr("active",title).unbind("click").click(function(){
 			finishZone(zone);
 	});
 	
 	//Prepare the map for defining a zone
-	listener = google.maps.event.addListener(map, "click", function(event){
+	listeners['click_map'] = google.maps.event.addListener(map, "click", function(event){
 			zone.addPoint(event.latLng);
 	});
 	
@@ -172,7 +201,7 @@ function finishZone(zone){
 	//Make the zone static on the map
 	zone.finishEdit();
 	zone.save();
-	google.maps.event.removeListener(listener);
+	google.maps.event.removeListener(listeners['click_map']);
 	
 	//Change the button state
 	$btn.removeClass('inprogress').text($btn.attr("oldtext")).removeAttr("oldtext").removeAttr("active").unbind("click").click(function(){

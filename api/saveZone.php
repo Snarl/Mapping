@@ -9,21 +9,35 @@ if(!isset($_GET['title'])){
 }else{
 
 	$title = $_GET['title'];
-	$file = $sfile = "{$settings['data_dir']}/{$title}.zone";
+	$file = "{$settings['data_dir']}/{$title}.zone";
 
 	if(!file_exists($file)){
-		$file = "{$settings['data_dir']}/zone.example";
-	}
-
-	$zone = simplexml_load_file($file);
-	
-	$zone->title = $title;
-	
-	if(isset($_GET['coords'])){
-		//wipe old coords and add new
+		$zone = simplexml_load_string("<zone></zone>");
+		$zone->addChild("nodes");
+		$zone->addChild("exits");
+	}else{
+		$zone = simplexml_load_file($file);
 	}
 	
-	print_r($xml);
+	$zone->addAttribute("title",$title);
+	
+	if(isset($_GET['nodes'])){
+		unset($zone->nodes->node);
+		$nodes = explode(";",$_GET['nodes']);
+		foreach($nodes as $node){
+			$node = explode(",",substr($node,1,-1));
+			$child = $zone->nodes->addChild("node");
+			$child->addAttribute("lat",$node[0]);
+			$child->addAttribute("lng",$node[1]);
+		}
+	}
+	
+	$dom = new DOMDocument('1.0');
+	$dom->preserveWhiteSpace = false;
+	$dom->formatOutput = true;
+	$dom->loadXML($zone->asXML());
+	
+	file_put_contents($file,$dom->saveXML());
 	
 }
 
