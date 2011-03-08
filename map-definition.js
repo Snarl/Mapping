@@ -1,4 +1,6 @@
-var map, listeners, zones = new Array();
+var map, listeners = new Array(), zones = new Array();
+
+listeners["zoneclick"] = new Array();
 
 var colours = {
 	"line" : "#3355ff",
@@ -140,7 +142,7 @@ function Zone(){
 		});
 		this.shape.setMap(map);
 		if(old){ old.setMap(null); }
-		google.maps.event.addListener(this.shape, "click", function(){
+		listeners["zoneclick"][this.title] = google.maps.event.addListener(this.shape, "click", function(){
 			//todo Select this zone on the right menu
 		});
 	}
@@ -153,21 +155,28 @@ function Zone(){
 		this.markers.length = 0;
 	};
 	
-	this.finishEdit = function() {
+	this.finishEdit = function(prim) {
 		for(var n = 0; n< this.markers.length; n++){
 			this.markers[n].dragging = false;
 			this.markers[n].draggable = false;
 			this.markers[n].visible = false;
 		}
-		//this.blendTo(colours['norm'],1000);
+		if(prim!==true){
+			google.maps.event.clearListeners(map,"click");
+			//google.maps.event.removeListener(listener_mapclick);
+			this.save();
+		}
 	};
 
 	this.startEdit = function() {
+		var z = this;
 		for(var n = 0; n< this.markers.length; n++){
 			this.markers[n].draggable = true;
 			this.markers[n].visible = true;
 		}
-		//this.blendTo(colours['edit'],1000);
+		listeners["mapclick"] = google.maps.event.addListener(map, "click", function(event){
+			z.addPoint(event.latLng);
+		});
 	};
 
 	this.save = function(){
@@ -181,6 +190,12 @@ function Zone(){
 		
 	};
 	
+	this.remove = function(){
+		$.get("api/removeZone.php", {id: this.title});
+		this.shape.setMap(null);
+		$('#zonelist').children("option:containsRegEx('^"+this.title+"$')").remove();
+	}
+	
 }
 
 function loadZones(){
@@ -193,7 +208,7 @@ function loadZones(){
 			for(var i = 0;i < nodes.length;i++){
 				zone.addPoint(new google.maps.LatLng(nodes[i].lat, nodes[i].lng));
 			}
-			zone.finishEdit();
+			zone.finishEdit(true);
 			zones.push(zone);
 			// Add to list
 			$('#zonelist').append("<option value='"+(zones.length-1)+"'>"+k+"</option>");
@@ -217,7 +232,7 @@ $(document).ready(function(){
 	//Add various functions to various buttons
 	
 		$('#zonedefine').click(function(){
-			startZone();
+			createZone();
 		});
 		
 		var $list = $('#zonelist');
@@ -229,6 +244,9 @@ $(document).ready(function(){
 				}
 			}else{
 				$('#zoneoptions').slideDown();
+				for(i=0;i<zones.length;i++){
+					zones[i].blendTo(colours['norm'],0);
+				}
 				zones[$list.val()].blendTo(colours['edit']);
 			}
 		});
@@ -240,47 +258,37 @@ $(document).ready(function(){
 		$('#zoneoptions button.pan').click(function(){
 			zones[$list.val()].panTo();
 		});
-
-	
+		
+		$('#zoneoptions button.edit').click(function(){
+			zones[$list.val()].startEdit();
+			var $this = $(this);
+			$list.attr('disabled','disabled');
+			$this.text('Finish').click(function(){
+				zones[$list.val()].finishEdit();
+				$list.removeAttr('disabled');
+				$this.text('Edit');
+			});
+		});
+		
+		$('#zoneoptions button.remove').click(function(){
+			zones[$list.val()].remove();
+		});
 });
 
-function startZone(){
-	
-	$btn = $('#zonedefine');
+function createZone(){
 	
 	//Get title from user
 	var title = prompt("Name your zone");
 	if(title==null){
 		return false;
 	}
+	
 	var zone = new Zone();
 	zone.setTitle(title);
 	zones.push(zone);
-	
-	//Change the button state, make clicking it again finish the zone.
-	$btn.addClass('inprogress').attr("oldtext",$btn.text()).text("Finish defining '"+title+"'").attr("active",title).unbind("click").click(function(){
-			finishZone(zone);
-	});
-	
-	//Prepare the map for defining a zone
-	listeners['click_map'] = google.maps.event.addListener(map, "click", function(event){
-			zone.addPoint(event.latLng);
-	});
-	
-}
 
-function finishZone(zone){
-	
-	$btn = $('#zonedefine');
-	
-	//Make the zone static on the map
-	zone.finishEdit();
-	zone.save();
-	google.maps.event.removeListener(listeners['click_map']);
-	
-	//Change the button state
-	$btn.removeClass('inprogress').text($btn.attr("oldtext")).removeAttr("oldtext").removeAttr("active").unbind("click").click(function(){
-			startZone();
-	});
+	// Add to list and prepare edit 
+	$('#zonelist').append("<option value='"+(zones.length-1)+"'>"+title+"</option>").val(zones.length-1).change();
+	$('#zoneoptions button.edit').click();
 	
 }

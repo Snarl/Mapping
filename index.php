@@ -36,7 +36,7 @@
 						<button class="zoom">Zoom to</button>
 						<button class="pan">Pan to</button>
 						<button class="edit">Edit</button>
-						<button class="delete">Delete</button>
+						<button class="remove">Delete</button>
 					</div>
 					<h4>Exits</h4>
 				</div>
