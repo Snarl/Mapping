@@ -33,6 +33,10 @@ body { height: 100%; margin: 0px; padding: 0px }
 	min-height: 100px;
 }
 
+#zoneoptions {
+	display: none;
+}
+
 #tools {
 	float: right;
 	width: 26%;

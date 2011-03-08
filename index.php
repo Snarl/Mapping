@@ -10,11 +10,11 @@
 		<link rel="stylesheet" href="style.css" type="text/css" />
 
 		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-		<script type="text/javascript" src="http://code.jquery.com/jquery-1.5.1.min.js"></script>
+		<script type="text/javascript" src="jquery-1.5.1.js"></script>
 		<script type="text/javascript" src="map-definition.js"></script>
 
 	</head>
-
+	
 	<body>
 
 		<div id="container">
@@ -30,8 +30,14 @@
 					<h4>Zones</h4>
 					<button id="zonedefine">Create zone</button> or 
 					<select id="zonelist">
-						<option>select a zone</option>
+						<option value="none">select a zone</option>
 					</select>
+					<div id="zoneoptions">
+						<button class="zoom">Zoom to</button>
+						<button class="pan">Pan to</button>
+						<button class="edit">Edit</button>
+						<button class="delete">Delete</button>
+					</div>
 					<h4>Exits</h4>
 				</div>
 			</div>
