@@ -193,7 +193,15 @@ function Zone(){
 	this.remove = function(){
 		$.get("api/removeZone.php", {id: this.title});
 		this.shape.setMap(null);
-		$('#zonelist').children("option:containsRegEx('^"+this.title+"$')").remove();
+		delete this.shape;
+		var title = this.title;
+		$('#zonelist').children().each(function(){
+			var $this = $(this);
+			if($this.text()==title){
+				$this.remove();
+				return false;
+			}
+		});
 	}
 	
 }
@@ -211,7 +219,7 @@ function loadZones(){
 			zone.finishEdit(true);
 			zones.push(zone);
 			// Add to list
-			$('#zonelist').append("<option value='"+(zones.length-1)+"'>"+k+"</option>");
+			$('#zonelist').append("<option>"+k+"</option>");
 		});
 	});
 }
@@ -236,6 +244,7 @@ $(document).ready(function(){
 		});
 		
 		var $list = $('#zonelist');
+		var $id = $('#zoneid');
 		$list.change(function(){
 			if($list.val()=="none"){
 				$('#zoneoptions').slideUp();
@@ -243,36 +252,45 @@ $(document).ready(function(){
 					zones[i].blendTo(colours['norm']);
 				}
 			}else{
+				for(i=0;i<zones.length;i++){
+					if(zones[i].getTitle()==$('option:selected',$list).text()){
+						$id.val(i);
+						break;
+					}
+				}
 				$('#zoneoptions').slideDown();
 				for(i=0;i<zones.length;i++){
 					zones[i].blendTo(colours['norm'],0);
 				}
-				zones[$list.val()].blendTo(colours['edit']);
+				zones[$id.val()].blendTo(colours['edit']);
 			}
 		});
 		
 		$('#zoneoptions button.zoom').click(function(){
-			zones[$list.val()].zoomTo();
+			zones[$id.val()].zoomTo();
 		});
 		
 		$('#zoneoptions button.pan').click(function(){
-			zones[$list.val()].panTo();
+			zones[$id.val()].panTo();
 		});
 		
 		$('#zoneoptions button.edit').click(function(){
-			zones[$list.val()].startEdit();
+			zones[$id.val()].startEdit();
 			var $this = $(this);
 			$list.attr('disabled','disabled');
 			$this.text('Finish').click(function(){
-				zones[$list.val()].finishEdit();
+				zones[$id.val()].finishEdit();
 				$list.removeAttr('disabled');
 				$this.text('Edit');
 			});
 		});
 		
 		$('#zoneoptions button.remove').click(function(){
-			zones[$list.val()].remove();
+			zones[$id.val()].remove();
+			zones.splice($id.val(),1);
+			$('#zoneoptions').slideUp();
 		});
+		
 });
 
 function createZone(){

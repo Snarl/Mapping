@@ -33,6 +33,7 @@
 						<option value="none">select a zone</option>
 					</select>
 					<div id="zoneoptions">
+						<input type="hidden" id="zoneid" />
 						<button class="zoom">Zoom to</button>
 						<button class="pan">Pan to</button>
 						<button class="edit">Edit</button>
