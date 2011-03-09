@@ -60,6 +60,10 @@ function Zone(){
 	
 	this.blendTo = function(to_string, time){
 		
+		if(this.shape===undefined){
+			return true;
+		}
+		
 		if(time===undefined){
 			time = "1000";
 		}
@@ -88,14 +92,11 @@ function Zone(){
 
 			function padhex(val){
 				return (val.length==1)?"0"+val:val;
-			}
-
-			z.fillColor = '#'+
-				padhex(from[0].toString(16)) +
-				padhex(from[1].toString(16)) +
-				padhex(from[2].toString(16));
+			}	
 				
-			z.draw();
+			z.shape.setOptions({
+				fillColor: padhex(from[0].toString(16)) + padhex(from[1].toString(16)) + padhex(from[2].toString(16))
+			});
 				
 			if(count<steps){
 				var t = setTimeout(function(){
@@ -158,21 +159,20 @@ function Zone(){
 	this.finishEdit = function(prim) {
 		for(var n = 0; n< this.markers.length; n++){
 			this.markers[n].dragging = false;
-			this.markers[n].draggable = false;
-			this.markers[n].visible = false;
+			this.markers[n].setDraggable(false);
+			this.markers[n].setVisible(false);
 		}
 		if(prim!==true){
 			google.maps.event.clearListeners(map,"click");
-			//google.maps.event.removeListener(listener_mapclick);
-			this.save();
+			//google.maps.event.removeListener(listeners['mapclick']);
 		}
 	};
 
 	this.startEdit = function() {
 		var z = this;
 		for(var n = 0; n< this.markers.length; n++){
-			this.markers[n].draggable = true;
-			this.markers[n].visible = true;
+			this.markers[n].setDraggable(true);
+			this.markers[n].setVisible(true);
 		}
 		listeners["mapclick"] = google.maps.event.addListener(map, "click", function(event){
 			z.addPoint(event.latLng);
@@ -185,13 +185,16 @@ function Zone(){
 			"title": this.title,
 			"nodes": this.points.join(";").replace(/ /g,"")
 		}, function(result){
-			//todo Acknowledge save
+			if(result!=""){
+				alert(result);
+			}
 		});
 		
 	};
 	
 	this.remove = function(){
 		$.get("api/removeZone.php", {id: this.title});
+		this.finishEdit();
 		this.shape.setMap(null);
 		delete this.shape;
 		var title = this.title;
@@ -281,6 +284,7 @@ $(document).ready(function(){
 				$(this).text('Finish')
 			},function(){
 				zones[$id.val()].finishEdit();
+				zones[$id.val()].save();
 				$list.removeAttr('disabled');
 				$(this).text('Edit');
 			}
@@ -308,6 +312,7 @@ function createZone(){
 
 	// Add to list and prepare edit 
 	$('#zonelist').append("<option value='"+(zones.length-1)+"'>"+title+"</option>").val(zones.length-1).change();
+	console.dir($('#zoneoptions button.edit'));
 	$('#zoneoptions button.edit').click();
 	
 }

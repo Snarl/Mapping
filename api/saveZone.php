@@ -15,15 +15,20 @@ if(!isset($_GET['title'])){
 		$zone = simplexml_load_string("<zone></zone>");
 		$zone->addChild("nodes");
 		$zone->addChild("exits");
+		$zone->addAttribute("title",$title);
 	}else{
 		$zone = simplexml_load_file($file);
+		$zone->title = $title;
 	}
 	
-	$zone->addAttribute("title",$title);
-	
-	if(isset($_GET['nodes'])){
+	if( (!isset($_GET['nodes'])) || ($_GET['nodes']='')){
+		die("Cannot save a zone without any nodes.");	
+	}else{
 		unset($zone->nodes->node);
 		$nodes = explode(";",$_GET['nodes']);
+		if(count($nodes)==0){
+			die("Cannot save a zone without any nodes.");
+		}
 		foreach($nodes as $node){
 			$node = explode(",",substr($node,1,-1));
 			$child = $zone->nodes->addChild("node");
