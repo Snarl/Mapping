@@ -274,16 +274,17 @@ $(document).ready(function(){
 			zones[$id.val()].panTo();
 		});
 		
-		$('#zoneoptions button.edit').click(function(){
-			zones[$id.val()].startEdit();
-			var $this = $(this);
-			$list.attr('disabled','disabled');
-			$this.text('Finish').click(function(){
+		$('#zoneoptions button.edit').toggle(
+			function(){
+				zones[$id.val()].startEdit();
+				$list.attr('disabled','disabled');
+				$(this).text('Finish')
+			},function(){
 				zones[$id.val()].finishEdit();
 				$list.removeAttr('disabled');
-				$this.text('Edit');
-			});
-		});
+				$(this).text('Edit');
+			}
+		);
 		
 		$('#zoneoptions button.remove').click(function(){
 			zones[$id.val()].remove();

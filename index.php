@@ -5,7 +5,7 @@
 
 		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 
-		<base href="http://localhost/maps/" />
+		<base href="/maps/" />
 
 		<link rel="stylesheet" href="style.css" type="text/css" />
 
