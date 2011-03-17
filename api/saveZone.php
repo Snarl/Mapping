@@ -20,8 +20,8 @@ if(!isset($_GET['title'])){
 		$zone = simplexml_load_file($file);
 		$zone->title = $title;
 	}
-	
-	if( (!isset($_GET['nodes'])) || ($_GET['nodes']='')){
+
+	if( (!isset($_GET['nodes'])) || ($_GET['nodes']=='')){
 		die("Cannot save a zone without any nodes.");	
 	}else{
 		unset($zone->nodes->node);

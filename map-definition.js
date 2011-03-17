@@ -181,9 +181,15 @@ function Zone(){
 
 	this.save = function(){
 		
+		var pos = new Array();
+		
+		for(i=0;i<this.markers.length;i++){
+			pos.push(this.markers[i].getPosition().toUrlValue(10));
+		}
+
 		$.get("api/saveZone.php", {
 			"title": this.title,
-			"nodes": this.points.join(";").replace(/ /g,"")
+			"nodes": encodeURI(pos.join(';'))
 		}, function(result){
 			if(result!=""){
 				alert(result);
@@ -263,7 +269,7 @@ $(document).ready(function(){
 				}
 				$('#zoneoptions').slideDown();
 				for(i=0;i<zones.length;i++){
-					zones[i].blendTo(colours['norm'],0);
+					zones[i].blendTo(colours['norm']);
 				}
 				zones[$id.val()].blendTo(colours['edit']);
 			}
@@ -312,7 +318,6 @@ function createZone(){
 
 	// Add to list and prepare edit 
 	$('#zonelist').append("<option value='"+(zones.length-1)+"'>"+title+"</option>").val(zones.length-1).change();
-	console.dir($('#zoneoptions button.edit'));
 	$('#zoneoptions button.edit').click();
 	
 }
