@@ -30,7 +30,7 @@ if(!isset($_GET['title'])){
 			die("Cannot save a zone without any nodes.");
 		}
 		foreach($nodes as $node){
-			$node = explode(",",substr($node,1,-1));
+			$node = explode(",",$node);
 			$child = $zone->nodes->addChild("node");
 			$child->addAttribute("lat",$node[0]);
 			$child->addAttribute("lng",$node[1]);

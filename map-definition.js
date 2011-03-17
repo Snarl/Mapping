@@ -184,7 +184,7 @@ function Zone(){
 		var pos = new Array();
 		
 		for(i=0;i<this.markers.length;i++){
-			pos.push(this.markers[i].getPosition().toUrlValue(10));
+			pos.push(this.markers[i].getPosition().toUrlValue(14));
 		}
 
 		$.get("api/saveZone.php", {
@@ -227,6 +227,7 @@ function loadZones(){
 			}
 			zone.finishEdit(true);
 			zones.push(zone);
+			console.log(zones);
 			// Add to list
 			$('#zonelist').append("<option>"+k+"</option>");
 		});
