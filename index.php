@@ -28,18 +28,29 @@
 				<div id="tools">
 					<h3>Tools</h3>
 					<h4>Zones</h4>
-					<button id="zonedefine">Create zone</button> or 
-					<select id="zonelist">
-						<option value="none">select a zone</option>
-					</select>
-					<div id="zoneoptions">
-						<input type="hidden" id="zoneid" />
-						<button class="zoom">Zoom to</button>
-						<button class="pan">Pan to</button>
-						<button class="edit">Edit</button>
-						<button class="remove">Delete</button>
-					</div>
+						<button id="zonedefine">Create zone</button> or 
+						<select id="zonelist">
+							<option value="none">select a zone</option>
+						</select>
+						<div id="zoneoptions" class="options">
+							<input type="hidden" id="zoneid" />
+							<button class="zoom">Zoom to</button>
+							<button class="pan">Pan to</button>
+							<button class="edit">Edit</button>
+							<button class="remove">Delete</button>
+						</div>
 					<h4>Exits</h4>
+						<button id="exitdefine">Create exit</button> or 
+						<select id="exitlist">
+							<option value="none">select a exit</option>
+						</select>
+						<div id="exitoptions" class="options">
+							<input type="hidden" id="exitid" />
+							<button class="zoom">Zoom to</button>
+							<button class="pan">Pan to</button>
+							<button class="edit">Edit</button>
+							<button class="remove">Delete</button>
+						</div>
 				</div>
 			</div>
 		</div>

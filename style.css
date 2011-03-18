@@ -33,7 +33,7 @@ body { height: 100%; margin: 0px; padding: 0px }
 	min-height: 100px;
 }
 
-#zoneoptions {
+.options {
 	display: none;
 }
 

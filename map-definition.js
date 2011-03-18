@@ -1,19 +1,18 @@
-var map, listeners = new Array(), zones = new Array();
-
-listeners["zoneclick"] = new Array();
+var map, map_click, zones = new Array(), exits = new Array(); 
 
 var colours = {
 	"line" : "#3355ff",
 	"edit" : "#335599",
-	"norm" : "#ff0000"
+	"norm" : "#ff0000",
+	"exit" : "#00ff00",
 };
 
 function Zone(){
 
-	this.shape;
+	this.shape, this.click;
 	this.points = new Array();
 	this.markers = new Array();
-	this.title = "untitled";
+	this.title = "untitled node";
 	
 	this.fillColor = colours['norm'];
 	
@@ -23,13 +22,14 @@ function Zone(){
 	
 	this.setTitle = function(t){
 		this.title = t;
+		//todo Will need to rename the save file, else title change will only be for the session.
 	}
 
 	this.addPoint = function(pos) {
 
 		var z = this;
 
-		// Make markersp
+		// Make markers
 		var marker = new google.maps.Marker({
 			icon:'./square.png', 
 			draggable:true, 
@@ -126,6 +126,10 @@ function Zone(){
 		map.fitBounds(this.getBounds());
 	}
 	
+	this.getIndex = function() {
+		return $.inArray(this,zones);
+	}
+	
 	this.draw = function() {
 		var z = this;
 		if(this.shape) { var old = this.shape }
@@ -143,8 +147,9 @@ function Zone(){
 		});
 		this.shape.setMap(map);
 		if(old){ old.setMap(null); }
-		listeners["zoneclick"][this.title] = google.maps.event.addListener(this.shape, "click", function(){
-			//todo Select this zone on the right menu
+		this.click = google.maps.event.addListener(this.shape, "click", function(){
+			var index = z.getIndex();
+			$('#zonelist').val(index).change();
 		});
 	}
 	
@@ -164,7 +169,7 @@ function Zone(){
 		}
 		if(prim!==true){
 			google.maps.event.clearListeners(map,"click");
-			//google.maps.event.removeListener(listeners['mapclick']);
+			//google.maps.event.removeListener(map_click);
 		}
 	};
 
@@ -174,7 +179,7 @@ function Zone(){
 			this.markers[n].setDraggable(true);
 			this.markers[n].setVisible(true);
 		}
-		listeners["mapclick"] = google.maps.event.addListener(map, "click", function(event){
+		map_click = google.maps.event.addListener(map, "click", function(event){
 			z.addPoint(event.latLng);
 		});
 	};
@@ -219,19 +224,242 @@ function loadZones(){
 	$.getJSON("api/getZones.php",function(data){
 		$.each(data, function(k, v){
 			// Create Zone object
-			var zone = new Zone();
-			zone.setTitle(k);
+			zone = createZone(k);
 			nodes = v.nodes.node;
 			for(var i = 0;i < nodes.length;i++){
 				zone.addPoint(new google.maps.LatLng(nodes[i].lat, nodes[i].lng));
 			}
 			zone.finishEdit(true);
-			zones.push(zone);
-			console.log(zones);
-			// Add to list
-			$('#zonelist').append("<option>"+k+"</option>");
 		});
 	});
+}
+
+function createZone(title){
+	
+	var click = false;
+	if(title===undefined){
+		click = true;
+		var title = prompt("Name your zone");
+		if(title==null){
+			return false;
+		}
+	}
+	
+	// Create object
+	var zone = new Zone();
+	zone.setTitle(title);
+	zones.push(zone);
+	// Add to list
+	$('#zonelist').append("<option value='"+(zones.length-1)+"'>"+title+"</option>").val(zones.length-1).change();
+	
+	if(click){
+		$('#zoneoptions button.edit').click();
+	}
+	
+	return zones[zones.length-1];
+	
+}
+
+function Exit(){
+
+	this.shape, this.click;
+	this.points = new Array();
+	this.markers = new Array();
+	this.title = "untitled exit";
+	
+	this.getTitle = function(){
+		return this.title;
+	}
+	
+	this.setTitle = function(t){
+		this.title = t;
+		//todo Will need to rename the save file, else title change will only be for the session.
+	}
+
+	this.addPoint = function(pos) {
+
+		var z = this;
+		
+		if(this.points.length>=2){
+			return false;
+		}
+
+		// Make markers
+		var marker = new google.maps.Marker({
+			icon:'./square.png', 
+			draggable:true, 
+			bouncy:false, 
+			position:pos,
+		});
+		marker.setMap(map);
+		this.markers.push(marker);
+
+		// Add events
+		google.maps.event.addListener(marker, "drag", function() {
+			z.draw();
+		});
+
+		google.maps.event.addListener(marker, "click", function() {
+			for(var n = 0; n < z.markers.length; n++) {
+				if(z.markers[n] == marker) {
+					z.markers[n].setMap(null);
+					break;
+				}
+			}
+			z.markers.splice(n, 1);
+			z.draw();
+		});
+
+		this.draw();
+	}
+		
+	this.getBounds = function(){
+		var bounds=new google.maps.LatLngBounds;
+		for(var i = 0; i < this.markers.length; i++){
+			bounds.extend(this.markers[i].position);
+		}
+		return bounds;
+	}
+
+	this.panTo = function() {
+		map.panTo(this.getBounds().getCenter());
+	};
+	
+	this.zoomTo = function(){
+		map.fitBounds(this.getBounds());
+	}
+	
+	this.getIndex = function() {
+		return $.inArray(this,exits);
+	}
+	
+	this.draw = function() {
+		var z = this;
+		if(this.shape) { var old = this.shape }
+		this.points.length = 0;	
+		for(var i = 0; i < this.markers.length; i++) {
+			this.points.push(this.markers[i].getPosition());
+		}
+		this.shape = new google.maps.Polyline({
+			path: this.points, 
+			strokeColor: colours['line'], 
+			strokeWeight: 3, 
+			strokeOpacity: 0.8
+		});
+		this.shape.setMap(map);
+		if(old){ old.setMap(null); }
+		this.click = google.maps.event.addListener(this.shape, "click", function(){
+			var index = z.getIndex();
+			$('#exitlist').val(index).change();
+		});
+	}
+	
+	this.clear = function() {
+		for(var n = 0; n<this.markers.length; n++){
+			this.markers[n].setMap(null)
+		}
+		this.points.length = 0;
+		this.markers.length = 0;
+	};
+	
+	this.finishEdit = function(prim) {
+		for(var n = 0; n< this.markers.length; n++){
+			this.markers[n].dragging = false;
+			this.markers[n].setDraggable(false);
+			this.markers[n].setVisible(false);
+		}
+		if(prim!==true){
+			google.maps.event.clearListeners(map,"click");
+			//google.maps.event.removeListener(map_click);
+		}
+	};
+
+	this.startEdit = function() {
+		var z = this;
+		for(var n = 0; n< this.markers.length; n++){
+			this.markers[n].setDraggable(true);
+			this.markers[n].setVisible(true);
+		}
+		map_click = google.maps.event.addListener(map, "click", function(event){
+			z.addPoint(event.latLng);
+		});
+	};
+
+	this.save = function(){
+		
+		var pos = new Array();
+		
+		for(i=0;i<this.markers.length;i++){
+			pos.push(this.markers[i].getPosition().toUrlValue(14));
+		}
+
+		$.get("api/saveExit.php", {
+			"title": this.title,
+			"nodes": encodeURI(pos.join(';'))
+		}, function(result){
+			if(result!=""){
+				alert(result);
+			}
+		});
+		
+	};
+	
+	this.remove = function(){
+		$.get("api/removeExit.php", {id: this.title});
+		this.finishEdit();
+		this.shape.setMap(null);
+		delete this.shape;
+		var title = this.title;
+		$('#zonelist').children().each(function(){
+			var $this = $(this);
+			if($this.text()==title){
+				$this.remove();
+				return false;
+			}
+		});
+	}
+	
+}
+
+function loadExits(){
+	$.getJSON("api/getExits.php",function(data){
+		$.each(data, function(k, v){
+			// Create exit object
+			exit = createExit(k);
+			nodes = v.nodes.node;
+			for(var i = 0;i < nodes.length;i++){
+				exit.addPoint(new google.maps.LatLng(nodes[i].lat, nodes[i].lng));
+			}
+			exit.finishEdit(true);
+		});
+	});
+}
+
+function createExit(title){
+	
+	var click = false;
+	if(title===undefined){
+		click = true;
+		var title = prompt("Name your exit");
+		if(title==null){
+			return false;
+		}
+	}
+	
+	// Create object
+	var exit = new Exit();
+	exit.setTitle(title);
+	exits.push(exit);
+	// Add to list
+	$('#exitlist').append("<option value='"+(exits.length-1)+"'>"+title+"</option>").val(exits.length-1).change();
+	
+	if(click){
+		$('#exitoptions button.edit').click();
+	}
+	
+	return exits[exits.length-1];
+
+	
 }
 
 $(document).ready(function(){
@@ -245,26 +473,28 @@ $(document).ready(function(){
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	});
 	
-	loadZones();
+	// ZONES
 	
-	//Add various functions to various buttons
-	
+		loadZones();
+		
+		//Add various functions to various buttons
+		
 		$('#zonedefine').click(function(){
 			createZone();
 		});
 		
-		var $list = $('#zonelist');
-		var $id = $('#zoneid');
-		$list.change(function(){
-			if($list.val()=="none"){
+		var $zonelist = $('#zonelist');
+		var $zoneid = $('#zoneid');
+		$zonelist.change(function(){
+			if($zonelist.val()=="none"){
 				$('#zoneoptions').slideUp();
 				for(i=0;i<zones.length;i++){
 					zones[i].blendTo(colours['norm']);
 				}
 			}else{
 				for(i=0;i<zones.length;i++){
-					if(zones[i].getTitle()==$('option:selected',$list).text()){
-						$id.val(i);
+					if(zones[i].getTitle()==$('option:selected',$zonelist).text()){
+						$zoneid.val(i);
 						break;
 					}
 				}
@@ -272,53 +502,92 @@ $(document).ready(function(){
 				for(i=0;i<zones.length;i++){
 					zones[i].blendTo(colours['norm']);
 				}
-				zones[$id.val()].blendTo(colours['edit']);
+				zones[$zoneid.val()].blendTo(colours['edit']);
 			}
 		});
 		
 		$('#zoneoptions button.zoom').click(function(){
-			zones[$id.val()].zoomTo();
+			zones[$zoneid.val()].zoomTo();
 		});
 		
 		$('#zoneoptions button.pan').click(function(){
-			zones[$id.val()].panTo();
+			zones[$zoneid.val()].panTo();
 		});
 		
 		$('#zoneoptions button.edit').toggle(
 			function(){
-				zones[$id.val()].startEdit();
-				$list.attr('disabled','disabled');
+				zones[$zoneid.val()].startEdit();
+				$zonelist.attr('disabled','disabled');
 				$(this).text('Finish')
 			},function(){
-				zones[$id.val()].finishEdit();
-				zones[$id.val()].save();
-				$list.removeAttr('disabled');
+				zones[$zoneid.val()].finishEdit();
+				zones[$zoneid.val()].save();
+				$zonelist.removeAttr('disabled');
 				$(this).text('Edit');
 			}
 		);
 		
 		$('#zoneoptions button.remove').click(function(){
-			zones[$id.val()].remove();
-			zones.splice($id.val(),1);
+			zones[$zoneid.val()].remove();
+			zones.splice($zoneid.val(),1);
 			$('#zoneoptions').slideUp();
 		});
 		
+	// EXITS
+	
+		loadExits();
+		
+		//Add various functions to various buttons
+		
+		$('#exitdefine').click(function(){
+			createExit();
+		});
+		
+		var $exitlist = $('#exitlist');
+		var $exitid = $('#exitid');
+		$exitlist.change(function(){
+			if($exitlist.val()=="none"){
+				$('#exitoptions').slideUp();
+				for(i=0;i<exits.length;i++){
+					exits[i].blendTo(colours['norm']);
+				}
+			}else{
+				for(i=0;i<exits.length;i++){
+					if(exits[i].getTitle()==$('option:selected',$exitlist).text()){
+						$exitid.val(i);
+						break;
+					}
+				}
+				$('#exitoptions').slideDown();
+			}
+		});
+		
+		$('#exitoptions button.zoom').click(function(){
+			exits[$exitid.val()].zoomTo();
+		});
+		
+		$('#exitoptions button.pan').click(function(){
+			exits[$exitid.val()].panTo();
+		});
+		
+		$('#exitoptions button.edit').toggle(
+			function(){
+				exits[$exitid.val()].startEdit();
+				$exitlist.attr('disabled','disabled');
+				$(this).text('Finish')
+			},function(){
+				exits[$exitid.val()].finishEdit();
+				exits[$exitid.val()].save();
+				$exitlist.removeAttr('disabled');
+				$(this).text('Edit');
+			}
+		);
+		
+		$('#exitoptions button.remove').click(function(){
+			exits[$exitid.val()].remove();
+			exits.splice($exitid.val(),1);
+			$('#exitoptions').slideUp();
+		});
+
+		
 });
-
-function createZone(){
-	
-	//Get title from user
-	var title = prompt("Name your zone");
-	if(title==null){
-		return false;
-	}
-	
-	var zone = new Zone();
-	zone.setTitle(title);
-	zones.push(zone);
-
-	// Add to list and prepare edit 
-	$('#zonelist').append("<option value='"+(zones.length-1)+"'>"+title+"</option>").val(zones.length-1).change();
-	$('#zoneoptions button.edit').click();
-	
-}
