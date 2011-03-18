@@ -133,7 +133,8 @@ function Zone(){
 	this.draw = function() {
 		var z = this;
 		if(this.shape) { var old = this.shape }
-		this.points.length = 0;	
+		this.points.length = 0;
+		//todo Implement Sutherland-Hodgman (probably) clipping.
 		for(var i = 0; i < this.markers.length; i++) {
 			this.points.push(this.markers[i].getPosition());
 		}
