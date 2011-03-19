@@ -18,7 +18,7 @@ if(!isset($_GET['title'])){
 		$zone->addAttribute("title",$title);
 	}else{
 		$zone = simplexml_load_file($file);
-		$zone->title = $title;
+		$zone['title'] = $title;
 	}
 
 	if( (!isset($_GET['nodes'])) || ($_GET['nodes']=='')){
@@ -29,13 +29,23 @@ if(!isset($_GET['title'])){
 		if(count($nodes)==0){
 			die("Cannot save a zone without any nodes.");
 		}
+		$maxlat = $maxlng = $minlat = $min_lng = "";
 		foreach($nodes as $node){
-			$node = explode(",",$node);
+			list($lat,$lng) = explode(",",$node);
+			$maxlat = (empty($maxlat)||($lat>$maxlat))?$lat:$maxlat;
+			$maxlng = (empty($maxlng)||($lng>$maxlng))?$lng:$maxlng;
+			$minlat = (empty($minlat)||($lat<$minlat))?$lat:$minlat;
+			$minlng = (empty($minlng)||($lng<$minlng))?$lng:$minlng;
 			$child = $zone->nodes->addChild("node");
-			$child->addAttribute("lat",$node[0]);
-			$child->addAttribute("lng",$node[1]);
+			$child->addAttribute("lat",$lat);
+			$child->addAttribute("lng",$lng);
 		}
 	}
+	
+	$zone->nodes["maxlat"] = $maxlat;
+	$zone->nodes["maxlng"] = $maxlng;
+	$zone->nodes["minlat"] = $minlat;
+	$zone->nodes["minlng"] = $minlng;
 	
 	$dom = new DOMDocument('1.0');
 	$dom->preserveWhiteSpace = false;
