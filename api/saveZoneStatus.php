@@ -1,11 +1,16 @@
 <?php
 
+// Title: saveZoneStatus.php
+// Description: Save a status and a reason for that status to a zone
+// Author: Samuel Gaus
+// Args: title, status, reason
+
 require("config.php");
 
 if(!isset($_GET['title'])){
 	die("Don't know what zone to change the status for. Please supply a 'title'");
 }elseif(!isset($_GET['status'])){
-	die("You must set a status of red, yellow (or orange or amber), green or a number between 0 (red) and 100 (green)");
+	die("You must set a status of red, yellow (or orange or amber), green");
 }else{
 
 	$title = $_GET['title'];
@@ -19,26 +24,26 @@ if(!isset($_GET['title'])){
 	
 	switch($status){
 		case "red":
-			$status = 0;
+			$status = "red";
 			break;
 		case "orange":
 		case "yellow":
 		case "amber":
-			$status = 50;
+			$status = "orange";
 			break;
 		case "green":
-			$status = 100;
+			$status = "green";
 			break;
 		default:
 			if( (!is_numeric($status)) || ($status>100) || ($status < 0) ){
-				die("Status not understood. Red, yellow (or orange or amber), green or a number between 0 (red) and 100 (green).");
+				die("Status not understood. Red, yellow (or orange or amber), green");
 			}
 			break;
 	}
 	
 	$zone = simplexml_load_file($file);
-	$zone->addAttribute("status",$status); //expecting number between 0 and 100
-	$zone->addAttribute("reason",$_GET['reason']); //any string
+	$zone['status'] = $status; //status (red orange or green)
+	$zone['reason'] = $_GET['reason']; //any string
 	
 	$dom = new DOMDocument('1.0');
 	$dom->preserveWhiteSpace = false;

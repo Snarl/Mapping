@@ -1,5 +1,10 @@
 <?php
 
+// Title: getZoneFromPoint.php
+// Description: Determine in what zone a specific point lies (if any)
+// Author: Samuel Gaus
+// Args: point ("lat,lng")
+
 require("config.php");
 
 if(isset($_GET['point'])){

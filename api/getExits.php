@@ -1,5 +1,10 @@
 <?php
 
+// Title: getExits.php
+// Description: Get a list of exits served as JSON
+// Author: Samuel Gaus
+// Args: 
+
 	require("config.php");
 
 	require("xml2array.php");

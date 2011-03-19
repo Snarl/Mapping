@@ -1,5 +1,10 @@
 <?php
 
+// Title: saveZone.php
+// Description: Save information about a zone
+// Author: Samuel Gaus
+// Args: title, nodes ("lat,lng;lat,lng;....")
+
 require("config.php");
 
 if(!isset($_GET['title'])){

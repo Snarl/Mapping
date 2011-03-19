@@ -38,6 +38,12 @@
 							<button class="pan">Pan to</button>
 							<button class="edit">Edit</button>
 							<button class="remove">Delete</button>
+							<br />
+							<textarea class="reason">Give a reason and click a colour</textarea>
+							<br />
+							<button class="red"></button> 
+							<button class="orange"></button> 
+							<button class="green"></button>
 						</div>
 					<h4>Exits</h4>
 						<button id="exitdefine">Create exit</button> or 
@@ -50,6 +56,12 @@
 							<button class="pan">Pan to</button>
 							<button class="edit">Edit</button>
 							<button class="remove">Delete</button>
+							<br />
+							<textarea class="reason">Give a reason and click a colour</textarea>
+							<br />
+							<button class="red"></button> 
+							<button class="orange"></button> 
+							<button class="green"></button>
 						</div>
 				</div>
 			</div>

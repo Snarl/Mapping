@@ -1,5 +1,10 @@
 <?php
 
+// Title: saveExitStatus.php
+// Description: Save a status and a reason for that status to an exit
+// Author: Samuel Gaus
+// Args: title, status, reason
+
 require("config.php");
 
 if(!isset($_GET['title'])){
@@ -19,15 +24,15 @@ if(!isset($_GET['title'])){
 	
 	switch($status){
 		case "red":
-			$status = 0;
+			$status = "red";
 			break;
 		case "orange":
 		case "yellow":
 		case "amber":
-			$status = 50;
+			$status = "orange";
 			break;
 		case "green":
-			$status = 100;
+			$status = "green";
 			break;
 		default:
 			if( (!is_numeric($status)) || ($status>100) || ($status < 0) ){
@@ -37,8 +42,8 @@ if(!isset($_GET['title'])){
 	}
 	
 	$exit = simplexml_load_file($file);
-	$exit->addAttribute("status",$status); //expecting number between 0 and 100
-	$exit->addAttribute("reason",$_GET['reason']); //any string
+	$exit['status'] = $status; //expecting number between 0 and 100
+	$exit['reason'] = $_GET['reason']; //any string
 	
 	$dom = new DOMDocument('1.0');
 	$dom->preserveWhiteSpace = false;

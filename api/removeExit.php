@@ -1,5 +1,10 @@
 <?php
 
+// Title: removeExit.php
+// Description: Delete (actually archive) an exit
+// Author: Samuel Gaus
+// Args: title
+
 require("config.php");
 
 $old = "{$settings['data_dir']}/{$_GET['id']}.exit";

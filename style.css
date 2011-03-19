@@ -47,3 +47,23 @@ body { height: 100%; margin: 0px; padding: 0px }
 button.inprogress{
 	background-color: red;
 }
+
+textarea.reason {
+	width: 90%;
+}
+
+button.red, button.green, button.orange {
+	width: 30%;
+}
+
+button.red {
+	background-color: red;
+}
+
+button.green {
+	background-color: green;
+}
+
+button.orange {
+	background-color: #FFBF00;
+}

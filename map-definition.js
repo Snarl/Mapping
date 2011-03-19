@@ -13,6 +13,8 @@ function Zone(){
 	this.points = new Array();
 	this.markers = new Array();
 	this.title = "untitled node";
+	this.status;
+	this.reason;
 	
 	this.fillColor = colours['norm'];
 	
@@ -217,7 +219,25 @@ function Zone(){
 				return false;
 			}
 		});
-	}
+	};
+	
+	this.setStatus = function(status,reason){
+		this.status = status;
+		this.reason = reason;
+		$.get("api/saveZoneStatus.php", {
+			title: this.title,
+			status: status,
+			reason: reason
+		});
+	};
+	
+	this.refreshStatus = function(){
+		var z = this;
+		$.getJSON("api/getZoneStatus.php", { title: this.title }, function(data){
+			z.status = data.status;
+			z.reason = data.reason;
+		});
+	};
 	
 }
 
@@ -230,6 +250,7 @@ function loadZones(){
 			for(var i = 0;i < nodes.length;i++){
 				zone.addPoint(new google.maps.LatLng(nodes[i].lat, nodes[i].lng));
 			}
+			//zone.refreshStatus();
 			zone.finishEdit(true);
 		});
 	});
@@ -267,6 +288,8 @@ function Exit(){
 	this.points = new Array();
 	this.markers = new Array();
 	this.title = "untitled exit";
+	this.status;
+	this.reason;
 	
 	this.getTitle = function(){
 		return this.title;
@@ -419,6 +442,24 @@ function Exit(){
 			}
 		});
 	}
+		
+	this.setStatus = function(status,reason){
+		this.status = status;
+		this.reason = reason;
+		$.get("api/saveExitStatus.php", {
+			title: this.title,
+			status: status,
+			reason: reason
+		});
+	};
+	
+	this.refreshStatus = function(){
+		var z = this;
+		$.getJSON("api/getExitStatus.php", { title: this.title }, function(data){
+			z.status = data.status;
+			z.reason = data.reason;
+		});
+	};
 	
 }
 
@@ -431,6 +472,7 @@ function loadExits(){
 			for(var i = 0;i < nodes.length;i++){
 				exit.addPoint(new google.maps.LatLng(nodes[i].lat, nodes[i].lng));
 			}
+			//exit.refreshStatus();
 			exit.finishEdit(true);
 		});
 	});
@@ -472,6 +514,16 @@ $(document).ready(function(){
 		zoom: 16,
 		center: new google.maps.LatLng(51.500556, -0.126667),
 		mapTypeId: google.maps.MapTypeId.ROADMAP
+	});
+	
+	$('textarea.reason').focus(function(){
+		if(this.value==this.defaultValue){
+			this.value="";
+		}
+	}).blur(function(){
+		if(this.value==""){
+			this.value=this.defaultValue;
+		}
 	});
 	
 	// ZONES
@@ -534,6 +586,18 @@ $(document).ready(function(){
 			$('#zoneoptions').slideUp();
 		});
 		
+		$('#zoneoptions button.red, #zoneoptions button.orange, #zoneoptions button.green').click(function(){
+			var $this = $(this);
+			var $reason = $this.parent().children('textarea.reason')
+			var reason = $reason.val();
+			if(reason == $reason[0].defaultValue){
+				reason = "";
+			}
+			var status = $this.attr("class");
+			zones[$zoneid.val()].setStatus(status,reason);
+			$reason.val($reason[0].defaultValue);
+		});
+		
 	// EXITS
 	
 		loadExits();
@@ -590,5 +654,16 @@ $(document).ready(function(){
 			$('#exitoptions').slideUp();
 		});
 
+		$('#exitoptions button.red, #exitoptions button.orange, #exitoptions button.green').click(function(){
+			var $this = $(this);
+			var $reason = $this.parent().children('textarea.reason')
+			var reason = $reason.val();
+			if(reason = $reason[0].defaultValue){
+				reason = "";
+			}
+			var status = $this.attr("class");
+			exits[$exitid.val()].setStatus(status,reason);
+			$reason.val($reason[0].defaultValue);
+		});
 		
 });

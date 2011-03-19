@@ -1,5 +1,10 @@
 <?php
 
+// Title: getZones.php
+// Description: Get a list of zones in JSON
+// Author: Samuel Gaus
+// Args: 
+
 	require("config.php");
 
 	require("xml2array.php");
