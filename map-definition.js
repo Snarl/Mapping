@@ -206,6 +206,7 @@ function Zone(){
 			google.maps.event.clearListeners(map,"click");
 			//google.maps.event.removeListener(map_click);
 		}
+		this.blendTo(colours['high']);
 	};
 
 	this.startEdit = function() {
@@ -217,6 +218,7 @@ function Zone(){
 		map_click = google.maps.event.addListener(map, "click", function(event){
 			z.addPoint(event.latLng);
 		});
+		this.blendTo(colours['edit']);
 	};
 
 	this.save = function(){
@@ -635,7 +637,7 @@ $(document).ready(function(){
 				for(i=0;i<zones.length;i++){
 					zones[i].blendTo(colours['norm']);
 				}
-				zones[$zoneid.val()].blendTo(colours['edit']);
+				zones[$zoneid.val()].blendTo(colours['high']);
 			}
 		});
 		
