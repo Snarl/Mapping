@@ -1,4 +1,4 @@
-var map, map_click, zones = new Array(), exits = new Array(); 
+var map, map_click, zones = new Array(), exits = new Array(), zoneclick="select"; 
 
 var colours = {
 	"line" : "#3355ff",
@@ -10,7 +10,7 @@ var colours = {
 
 function Zone(){
 
-	this.shape, this.click;
+	this.shape, this.clickevent;
 	this.points = new Array();
 	this.markers = new Array();
 	this.title = "untitled node";
@@ -159,10 +159,33 @@ function Zone(){
 		});
 		this.shape.setMap(map);
 		if(old){ old.setMap(null); }
-		this.click = google.maps.event.addListener(this.shape, "click", function(){
-			var index = z.getIndex();
-			$('#zonelist').val(index).change();
+		this.clickevent = google.maps.event.addListener(this.shape, "click", function(){
+			z.click();
 		});
+	}
+	
+	this.click = function(){
+		switch(zoneclick){
+			case "link":
+				var exit = exits[$('#exitid').val()];
+				if($.inArray(this.title,exit.links)>-1){
+					exit.removeLink(this.title);
+					this.blendTo(colours['norm']);
+				}else{
+					exit.addLink(this.title);
+					this.blendTo(colours['high']);
+				}
+				break;
+			case "select":
+			default:
+				this.select();
+				break;
+		}
+	}
+	
+	this.select = function(){
+		var index = this.getIndex();
+		$('#zonelist').val(index).change();
 	}
 	
 	this.clear = function() {
@@ -493,21 +516,25 @@ function Exit(){
 		this.links.push(zone);	
 	}
 	
-	this.removeLink = function(){
-		$.each(this.links, function(k,v){
+	this.removeLink = function(zone){
+		z = this;
+		$.each(z.links, function(k,v){
 			if(v == zone){
-				this.links.splice(k,1);
+				z.links.splice(k,1);
 				return false;
 			}
 		});
 	}
 	
 	this.startLinking = function(){
+		zoneclick = "link";
 		this.showLinks();
 	}
 	
 	this.finishLinking = function(){
 		this.hideLinks();
+		this.save();
+		zoneclick = "select";
 	}
 	
 }
