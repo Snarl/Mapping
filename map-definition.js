@@ -3,8 +3,9 @@ var map, map_click, zones = new Array(), exits = new Array();
 var colours = {
 	"line" : "#3355ff",
 	"edit" : "#335599",
-	"norm" : "#ff0000",
+	"norm" : "#0000ff",
 	"exit" : "#00ff00",
+	"high" : "#ff0000"
 };
 
 function Zone(){
@@ -67,7 +68,7 @@ function Zone(){
 		}
 		
 		if(time===undefined){
-			time = "1000";
+			time = "0";
 		}
 		
 		var z = this, from_string = this.fillColor, steps = time/50, to = new Array(), from = new Array(), step = new Array();
@@ -76,40 +77,48 @@ function Zone(){
 			return true;
 		}
 		
-		$.each([0,1,2], function(k){
-			//create array of "to" r,g and b in dec
-			to[k]   = parseInt(to_string.substring(1+(2*k),3+(2*k)),16);
-			//create array of "from" r,g and b in dec
-			from[k] = parseInt(from_string.substring(1+(2*k),3+(2*k)),16);
-			//determine which step to use (round to zero)
-			v = (to[k] - from[k])/steps;
-			step[k] = Math[v > 0 ? "ceil" : "floor"](v);
-		});
-	
-		blendStep = function(count){
-
+		if(time>0){
 			$.each([0,1,2], function(k){
-				from[k] = Math[step[k] > 0 ? "min" : "max"](to[k],from[k]+step[k]);
+				//create array of "to" r,g and b in dec
+				to[k]   = parseInt(to_string.substring(1+(2*k),3+(2*k)),16);
+				//create array of "from" r,g and b in dec
+				from[k] = parseInt(from_string.substring(1+(2*k),3+(2*k)),16);
+				//determine which step to use (round to zero)
+				v = (to[k] - from[k])/steps;
+				step[k] = Math[v > 0 ? "ceil" : "floor"](v);
 			});
-
-			function padhex(val){
-				return (val.length==1)?"0"+val:val;
-			}	
-				
-			z.shape.setOptions({
-				fillColor: padhex(from[0].toString(16)) + padhex(from[1].toString(16)) + padhex(from[2].toString(16))
-			});
-				
-			if(count<steps){
-				var t = setTimeout(function(){
-					blendStep(count+1);
-				},50);
-			}
-			
-		};
 		
-		blendStep(0);
+			blendStep = function(count){
+
+				$.each([0,1,2], function(k){
+					from[k] = Math[step[k] > 0 ? "min" : "max"](to[k],from[k]+step[k]);
+				});
+
+				function padhex(val){
+					return (val.length==1)?"0"+val:val;
+				}	
+				
+				z.fillColor = padhex(from[0].toString(16)) + padhex(from[1].toString(16)) + padhex(from[2].toString(16));
+					
+				z.shape.setOptions({
+					fillColor: z.fillColor
+				});
+					
+				if(count<steps){
+					var t = setTimeout(function(){
+						blendStep(count+1);
+					},50);
+				}
+				
+			};
 			
+			blendStep(0);
+			
+		}else{
+			this.fillColor = to_string;
+			this.shape.setOptions({ fillColor : this.fillColor });
+		}
+				
 	}
 	
 	this.getBounds = function(){
@@ -287,6 +296,7 @@ function Exit(){
 	this.shape, this.click;
 	this.points = new Array();
 	this.markers = new Array();
+	this.links = new Array();
 	this.title = "untitled exit";
 	this.status;
 	this.reason;
@@ -419,7 +429,8 @@ function Exit(){
 
 		$.get("api/saveExit.php", {
 			"title": this.title,
-			"nodes": encodeURI(pos.join(';'))
+			"nodes": encodeURI(pos.join(';')),
+			"links": this.links.join(';')
 		}, function(result){
 			if(result!=""){
 				alert(result);
@@ -434,7 +445,7 @@ function Exit(){
 		this.shape.setMap(null);
 		delete this.shape;
 		var title = this.title;
-		$('#zonelist').children().each(function(){
+		$('#exitlist').children().each(function(){
 			var $this = $(this);
 			if($this.text()==title){
 				$this.remove();
@@ -461,6 +472,44 @@ function Exit(){
 		});
 	};
 	
+	this.showLinks = function(){
+		var links = this.links;
+		$.each(zones, function(k,v){
+			if($.inArray(v.getTitle(),links)>-1){
+				v.blendTo(colours['high']);
+			}else{
+				v.blendTo(colours['norm']);
+			}
+		});
+	}
+	
+	this.hideLinks = function(){
+		$.each(zones, function(k,v){
+			v.blendTo(colours['norm']);
+		});
+	}
+	
+	this.addLink = function(zone){
+		this.links.push(zone);	
+	}
+	
+	this.removeLink = function(){
+		$.each(this.links, function(k,v){
+			if(v == zone){
+				this.links.splice(k,1);
+				return false;
+			}
+		});
+	}
+	
+	this.startLinking = function(){
+		this.showLinks();
+	}
+	
+	this.finishLinking = function(){
+		this.hideLinks();
+	}
+	
 }
 
 function loadExits(){
@@ -471,6 +520,10 @@ function loadExits(){
 			nodes = v.nodes.node;
 			for(var i = 0;i < nodes.length;i++){
 				exit.addPoint(new google.maps.LatLng(nodes[i].lat, nodes[i].lng));
+			}
+			links = v.zones.zone;
+			for(var i = 0;i < links.length;i++){
+				exit.addLink(links[i].title);
 			}
 			//exit.refreshStatus();
 			exit.finishEdit(true);
@@ -613,9 +666,6 @@ $(document).ready(function(){
 		$exitlist.change(function(){
 			if($exitlist.val()=="none"){
 				$('#exitoptions').slideUp();
-				for(i=0;i<exits.length;i++){
-					exits[i].blendTo(colours['norm']);
-				}
 			}else{
 				for(i=0;i<exits.length;i++){
 					if(exits[i].getTitle()==$('option:selected',$exitlist).text()){
@@ -644,7 +694,7 @@ $(document).ready(function(){
 				exits[$exitid.val()].finishEdit();
 				exits[$exitid.val()].save();
 				$exitlist.removeAttr('disabled');
-				$(this).text('Edit');
+				$(this).text("Edit");
 			}
 		);
 		
@@ -653,6 +703,19 @@ $(document).ready(function(){
 			exits.splice($exitid.val(),1);
 			$('#exitoptions').slideUp();
 		});
+		
+		$('#exitoptions button.link').toggle(
+			function(){
+				exits[$exitid.val()].startLinking();
+				$exitlist.attr('disabled','disabled');
+				$(this).text('Finish')
+			},function(){
+				exits[$exitid.val()].finishLinking();
+				exits[$exitid.val()].save();
+				$exitlist.removeAttr('disabled');
+				$(this).text("Link");
+			}
+		);
 
 		$('#exitoptions button.red, #exitoptions button.orange, #exitoptions button.green').click(function(){
 			var $this = $(this);

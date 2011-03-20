@@ -19,15 +19,17 @@ if(!isset($_GET['title'])){
 	if(!file_exists($file)){
 		$exit = simplexml_load_string("<exit></exit>");
 		$exit->addChild("nodes");
+		$exit->addChild("zones");
 		$exit->addAttribute("title",$title);
 	}else{
 		$exit = simplexml_load_file($file);
-		$exit->title = $title;
+		$exit['title'] = $title;
 	}
 
 	if( (!isset($_GET['nodes'])) || ($_GET['nodes']=='')){
 		die("Cannot save a exit without any nodes.");	
 	}else{
+		//Add list of nodes
 		unset($exit->nodes->node);
 		$nodes = explode(";",$_GET['nodes']);
 		if(count($nodes)==0){
@@ -38,6 +40,13 @@ if(!isset($_GET['title'])){
 			$child = $exit->nodes->addChild("node");
 			$child->addAttribute("lat",$node[0]);
 			$child->addAttribute("lng",$node[1]);
+		}
+		//Add list of linked zones
+		unset($exit->zones->zone);
+		$zones = explode(";",$_GET['links']);
+		foreach($zones as $zone){
+			$child = $exit->zones->addChild("zone");
+			$child->addAttribute("title",$zone);
 		}
 	}
 	

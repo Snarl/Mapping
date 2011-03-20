@@ -30,7 +30,7 @@
 					<h4>Zones</h4>
 						<button id="zonedefine">Create zone</button> or 
 						<select id="zonelist">
-							<option value="none">select a zone</option>
+							<option value="none" selected>select a zone</option>
 						</select>
 						<div id="zoneoptions" class="options">
 							<input type="hidden" id="zoneid" />
@@ -48,7 +48,7 @@
 					<h4>Exits</h4>
 						<button id="exitdefine">Create exit</button> or 
 						<select id="exitlist">
-							<option value="none">select a exit</option>
+							<option value="none" selected>select a exit</option>
 						</select>
 						<div id="exitoptions" class="options">
 							<input type="hidden" id="exitid" />
@@ -56,6 +56,7 @@
 							<button class="pan">Pan to</button>
 							<button class="edit">Edit</button>
 							<button class="remove">Delete</button>
+							<button class="link">Link</button>
 							<br />
 							<textarea class="reason">Give a reason and click a colour</textarea>
 							<br />
