@@ -4,8 +4,9 @@ var colours = {
 	"line" : "#3355ff",
 	"edit" : "#335599",
 	"norm" : "#0000ff",
-	"exit" : "#00ff00",
-	"high" : "#ff0000"
+	"exit" : "#009900",
+	"high" : "#ff0000",
+	"hext" : "#00ff00"
 };
 
 function Zone(){
@@ -155,7 +156,8 @@ function Zone(){
 			strokeWeight: 3, 
 			strokeOpacity: .8, 
 			fillColor: this.fillColor,
-			fillOpacity: .3
+			fillOpacity: .3,
+			zIndex: 1
 		});
 		this.shape.setMap(map);
 		if(old){ old.setMap(null); }
@@ -329,6 +331,8 @@ function Exit(){
 	this.status;
 	this.reason;
 	
+	this.strokeColour = colours['exit'];
+	
 	this.getTitle = function(){
 		return this.title;
 	}
@@ -336,6 +340,66 @@ function Exit(){
 	this.setTitle = function(t){
 		this.title = t;
 		//todo Will need to rename the save file, else title change will only be for the session.
+	}
+	
+	this.blendTo = function(to_string, time){
+		
+		if(this.shape===undefined){
+			return true;
+		}
+		
+		if(time===undefined){
+			time = "0";
+		}
+		
+		var z = this, from_string = this.strokeColour, steps = time/50, to = new Array(), from = new Array(), step = new Array();
+		
+		if(to_string === from_string){
+			return true;
+		}
+		
+		if(time>0){
+			$.each([0,1,2], function(k){
+				//create array of "to" r,g and b in dec
+				to[k]   = parseInt(to_string.substring(1+(2*k),3+(2*k)),16);
+				//create array of "from" r,g and b in dec
+				from[k] = parseInt(from_string.substring(1+(2*k),3+(2*k)),16);
+				//determine which step to use (round to zero)
+				v = (to[k] - from[k])/steps;
+				step[k] = Math[v > 0 ? "ceil" : "floor"](v);
+			});
+		
+			blendStep = function(count){
+
+				$.each([0,1,2], function(k){
+					from[k] = Math[step[k] > 0 ? "min" : "max"](to[k],from[k]+step[k]);
+				});
+
+				function padhex(val){
+					return (val.length==1)?"0"+val:val;
+				}	
+				
+				z.strokeColour = padhex(from[0].toString(16)) + padhex(from[1].toString(16)) + padhex(from[2].toString(16));
+					
+				z.shape.setOptions({
+					strokeColor: z.strokeColour
+				});
+					
+				if(count<steps){
+					var t = setTimeout(function(){
+						blendStep(count+1);
+					},50);
+				}
+				
+			};
+			
+			blendStep(0);
+			
+		}else{
+			this.strokeColour = to_string;
+			this.shape.setOptions({ strokeColor : this.strokeColour });
+		}
+				
 	}
 
 	this.addPoint = function(pos) {
@@ -404,9 +468,10 @@ function Exit(){
 		}
 		this.shape = new google.maps.Polyline({
 			path: this.points, 
-			strokeColor: colours['line'], 
-			strokeWeight: 3, 
-			strokeOpacity: 0.8
+			strokeColor: this.strokeColour, 
+			strokeWeight: 9, 
+			strokeOpacity: 0.8,
+			zIndex: 10
 		});
 		this.shape.setMap(map);
 		if(old){ old.setMap(null); }
@@ -697,6 +762,9 @@ $(document).ready(function(){
 		$exitlist.change(function(){
 			if($exitlist.val()=="none"){
 				$('#exitoptions').slideUp();
+				for(i=0;i<exits.length;i++){
+					exits[i].blendTo(colours['exit']);
+				}
 			}else{
 				for(i=0;i<exits.length;i++){
 					if(exits[i].getTitle()==$('option:selected',$exitlist).text()){
@@ -705,6 +773,10 @@ $(document).ready(function(){
 					}
 				}
 				$('#exitoptions').slideDown();
+				for(i=0;i<exits.length;i++){
+					exits[i].blendTo(colours['exit']);
+				}
+				exits[$exitid.val()].blendTo(colours['hext']);
 			}
 		});
 		
