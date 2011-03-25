@@ -47,9 +47,8 @@ if(!isset($_GET['title'])){
 			$child->addAttribute("title",$zone);
 			//then add this exit to that zone, but don't bounce around infinitely
 			if( (!isset($_GET['int'])) || ($_GET['int'] != true) ){
-				$cmd = "php ./saveZone.php title=".urlencode($zone)." links=".urlencode($exit['title'])." int=true append=true";
-				//echo $cmd . "<br />\n";
-				exec($cmd);
+				//exec("php ./saveZone.php title=".urlencode($zone)." links=".urlencode($exit['title'])." int=true append=true");
+				callAPI("saveZone.php?title=".urlencode($zone)."&links=".urlencode($exit['title'])."&int=true&append=true");
 			}
 		}
 	}

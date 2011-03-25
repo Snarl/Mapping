@@ -47,7 +47,8 @@ if(!isset($_GET['title'])){
 			$child->addAttribute("title",$exit);
 			//then add this exit to that zone
 			if( (!isset($_GET['int'])) || ($_GET['int']!=true) ){
-				exec("php ./saveExit.php title=".urlencode($exit)." links=".urlencode($zone['title'])." int=true append=true");
+				//exec("php ./saveExit.php title=".urlencode($exit)." links=".urlencode($zone['title'])." int=true append=true");
+				callAPI("./saveExit.php?title=".urlencode($exit)."&links=".urlencode($zone['title'])."&int=true&append=true");
 			}
 		}
 	}
