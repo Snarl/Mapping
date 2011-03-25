@@ -166,6 +166,7 @@ function Zone(){
 	
 	this.click = function(){
 		switch(zoneclick){
+			case "nothing": break;
 			case "link":
 				var exit = exits[$('#exitid').val()];
 				if($.inArray(this.title,exit.links)>-1){
@@ -203,6 +204,7 @@ function Zone(){
 			this.markers[n].setVisible(false);
 		}
 		if(prim!==true){
+			zoneclick = "select";
 			google.maps.event.clearListeners(map,"click");
 			//google.maps.event.removeListener(map_click);
 		}
@@ -215,6 +217,7 @@ function Zone(){
 			this.markers[n].setDraggable(true);
 			this.markers[n].setVisible(true);
 		}
+		zoneclick = "nothing";
 		map_click = google.maps.event.addListener(map, "click", function(event){
 			z.addPoint(event.latLng);
 		});
