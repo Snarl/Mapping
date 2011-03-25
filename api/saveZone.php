@@ -21,7 +21,7 @@ if(!isset($_GET['title'])){
 	
 }else{
 
-	$title = $_GET['title'];
+	$title = stripslashes($_GET['title']);
 	$file = "{$settings['data_dir']}/" . str_replace("'","^",$title) . ".zone";
 	
 	if(!file_exists($file)){
