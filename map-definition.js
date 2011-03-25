@@ -535,7 +535,6 @@ function Exit(){
 	
 	this.finishLinking = function(){
 		this.hideLinks();
-		this.save();
 		zoneclick = "select";
 	}
 	

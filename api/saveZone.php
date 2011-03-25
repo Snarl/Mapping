@@ -7,6 +7,14 @@
 
 require("config.php");
 
+if(isset($argv)){
+	array_shift($argv);
+	foreach($argv as $v){
+		$q = explode("=",$v);
+		$_GET[$q[0]] = urldecode($q[1]);
+	}
+}
+
 if(!isset($_GET['title'])){
 	
 	die("Don't know what zone to save. Please supply a 'title'");
@@ -21,13 +29,33 @@ if(!isset($_GET['title'])){
 		$zone->addChild("nodes");
 		$zone->addChild("exits");
 		$zone->addAttribute("title",$title);
+		$new = true;
 	}else{
 		$zone = simplexml_load_file($file);
 		$zone['title'] = $title;
+		$new = false;
+	}
+	
+	if(isset($_GET['links'])){
+		//Add list of linked exits
+		if( (!isset($_GET['append'])) || ($_GET['append']!=true) ){
+			unset($zone->exits->exit);
+		}
+		$exits = explode(";",$_GET['links']);
+		foreach($exits as $exit){
+			$child = $zone->exits->addChild("exit");
+			$child->addAttribute("title",$exit);
+			//then add this exit to that zone
+			if( (!isset($_GET['int'])) || ($_GET['int']!=true) ){
+				exec("php ./saveExit.php title=".urlencode($exit)." links=".urlencode($zone['title'])." int=true append=true");
+			}
+		}
 	}
 
 	if( (!isset($_GET['nodes'])) || ($_GET['nodes']=='')){
-		die("Cannot save a zone without any nodes.");	
+		if($new){
+			die("Cannot save a zone without any nodes.");	
+		}
 	}else{
 		unset($zone->nodes->node);
 		$nodes = explode(";",$_GET['nodes']);
@@ -45,12 +73,11 @@ if(!isset($_GET['title'])){
 			$child->addAttribute("lat",$lat);
 			$child->addAttribute("lng",$lng);
 		}
+		$zone->nodes["maxlat"] = $maxlat;
+		$zone->nodes["maxlng"] = $maxlng;
+		$zone->nodes["minlat"] = $minlat;
+		$zone->nodes["minlng"] = $minlng;
 	}
-	
-	$zone->nodes["maxlat"] = $maxlat;
-	$zone->nodes["maxlng"] = $maxlng;
-	$zone->nodes["minlat"] = $minlat;
-	$zone->nodes["minlng"] = $minlng;
 	
 	$dom = new DOMDocument('1.0');
 	$dom->preserveWhiteSpace = false;
