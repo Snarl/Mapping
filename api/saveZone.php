@@ -22,8 +22,8 @@ if(!isset($_GET['title'])){
 }else{
 
 	$title = $_GET['title'];
-	$file = "{$settings['data_dir']}/{$title}.zone";
-
+	$file = "{$settings['data_dir']}/" . str_replace("'","^",$title) . ".zone";
+	
 	if(!file_exists($file)){
 		$zone = simplexml_load_string("<zone></zone>");
 		$zone->addChild("nodes");

@@ -14,7 +14,7 @@ if(!isset($_GET['title'])){
 }else{
 
 	$title = $_GET['title'];
-	$file = "{$settings['data_dir']}/{$title}.zone";
+	$file = "{$settings['data_dir']}/" . str_replace("'","^",$title) . ".zone";
 
 	if(!file_exists($file)){
 		die("{$title} does not exist. Cannot change the status of a non-existant zone. What would that even entail?");

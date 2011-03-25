@@ -22,7 +22,7 @@ if(!isset($_GET['title'])){
 }else{
 
 	$title = $_GET['title'];
-	$file = "{$settings['data_dir']}/{$title}.exit";
+	$file = "{$settings['data_dir']}/" . str_replace("'","^",$title) . ".exit";
 
 	if(!file_exists($file)){
 		$exit = simplexml_load_string("<exit></exit>");

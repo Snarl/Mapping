@@ -7,8 +7,10 @@
 
 require("config.php");
 
-$old = "{$settings['data_dir']}/{$_GET['id']}.zone";
-$new = "{$settings['data_dir']}/deleted/{$_GET['id']}." . time() . ".zone";
+$title = str_replace("'","^",$_GET['title']);
+
+$old = "{$settings['data_dir']}/{$title}.zone";
+$new = "{$settings['data_dir']}/deleted/{$title}." . time() . ".zone";
 rename($old,$new);
 
 ?>

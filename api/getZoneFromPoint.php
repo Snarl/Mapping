@@ -21,7 +21,7 @@ foreach($zonefiles as $zone){
 	if( ($lat <= $n['maxlat']) && ($lat >= $n['minlat']) && ($lng <= $n['maxlng']) && ($lng >= $n['minlng']) ){
 		//It's in the bounding box so test the point
 		if(isPointInZone($lat,$lng,$n)){
-			die($z['title']);
+			die(str_replace("^","'",$z['title']));
 		}
 	}
 }

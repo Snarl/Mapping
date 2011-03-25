@@ -14,7 +14,7 @@ if(!isset($_GET['title'])){
 }else{
 
 	$title = $_GET['title'];
-	$file = "{$settings['data_dir']}/{$title}.exit";
+	$file = "{$settings['data_dir']}/" . str_replace("'","^",$title) . ".exit";
 
 	if(!file_exists($file)){
 		die("{$title} does not exist. You can't set the status of a non-existant exit. Silly.");
