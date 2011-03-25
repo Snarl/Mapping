@@ -14,7 +14,7 @@ function Zone(){
 	this.shape, this.clickevent;
 	this.points = new Array();
 	this.markers = new Array();
-	this.title = "untitled node";
+	this.title = "untitled zone";
 	this.status;
 	this.reason;
 	
@@ -25,8 +25,15 @@ function Zone(){
 	}
 	
 	this.setTitle = function(t){
+		if(this.title!="untitled zone"){
+			$.get("api/renameZone.php", {
+				title: this.title,
+				new: t
+			});
+			var pos = this.getIndex()+1;
+			$('#zonelist option:eq('+pos+')').text(t);
+		}
 		this.title = t;
-		//todo Will need to rename the save file, else title change will only be for the session.
 	}
 
 	this.addPoint = function(pos) {
@@ -339,7 +346,14 @@ function Exit(){
 	
 	this.setTitle = function(t){
 		this.title = t;
-		//todo Will need to rename the save file, else title change will only be for the session.
+		if(this.title!="untitled exit"){
+			$.get("api/renameExit.php", {
+				title: this.title,
+				new: t
+			});
+			$('#exitlist option:eq('+this.getIndex()+')').text(t);
+		}
+		this.title = t;
 	}
 	
 	this.blendTo = function(to_string, time){
@@ -728,6 +742,14 @@ $(document).ready(function(){
 				$(this).text('Edit');
 			}
 		);
+		
+		$('#zoneoptions button.rename').click(function(){
+			var tnew = prompt("New title");
+			if(tnew == null){
+				return false;
+			}
+			zones[$zoneid.val()].setTitle(tnew);
+		});
 		
 		$('#zoneoptions button.remove').click(function(){
 			zones[$zoneid.val()].remove();

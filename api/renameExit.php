@@ -9,8 +9,8 @@ require("config.php");
 
 $deleting = ( (isset($_GET['del'])) && ($_GET['del']=="true") )?true:false;
 
-$title = $_GET['title'];
-$new = $_GET['new'];
+$title = stripslashes($_GET['title']);
+$new = stripslashes($_GET['new']);
 
 $file = "{$settings['data_dir']}/" . str_replace("'","^",$title) . ".exit";
 

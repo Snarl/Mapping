@@ -37,6 +37,7 @@
 							<button class="zoom">Zoom to</button>
 							<button class="pan">Pan to</button>
 							<button class="edit">Edit</button>
+							<button class="rename">Rename</button>
 							<button class="remove">Delete</button>
 							<br />
 							<textarea class="reason">Give a reason and click a colour</textarea>
@@ -55,6 +56,7 @@
 							<button class="zoom">Zoom to</button>
 							<button class="pan">Pan to</button>
 							<button class="edit">Edit</button>
+							<button class="rename">Rename</button>
 							<button class="remove">Delete</button>
 							<button class="link">Link</button>
 							<br />
