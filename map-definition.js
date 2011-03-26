@@ -351,7 +351,8 @@ function Exit(){
 				title: this.title,
 				new: t
 			});
-			$('#exitlist option:eq('+this.getIndex()+')').text(t);
+			var pos = this.getIndex()+1;
+			$('#exitlist option:eq('+pos+')').text(t);
 		}
 		this.title = t;
 	}
@@ -858,9 +859,9 @@ $(document).ready(function(){
 		$('#exitoptions button.orphan').click(function(){
 			var change = false;
 			$.each(exits,function(k,v){
-				console.dir(v);
 				if(v.links.length == 0){
 					$exitlist.val(k).change();
+					v.zoomTo();
 					change = true;
 					return false;
 				}
