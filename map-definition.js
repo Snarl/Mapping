@@ -859,7 +859,7 @@ $(document).ready(function(){
 		$('#exitoptions button.orphan').click(function(){
 			var change = false;
 			$.each(exits,function(k,v){
-				if(v.links.length == 0){
+				if(v.links.length < 2){
 					$exitlist.val(k).change();
 					v.zoomTo();
 					change = true;
