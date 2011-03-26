@@ -854,6 +854,21 @@ $(document).ready(function(){
 				$(this).text("Link");
 			}
 		);
+		
+		$('#exitoptions button.orphan').click(function(){
+			var change = false;
+			$.each(exits,function(k,v){
+				console.dir(v);
+				if(v.links.length == 0){
+					$exitlist.val(k).change();
+					change = true;
+					return false;
+				}
+			});
+			if(!change){
+				alert("No orphans! You clever boy/girl");
+			}
+		});
 
 		$('#exitoptions button.red, #exitoptions button.orange, #exitoptions button.green').click(function(){
 			var $this = $(this);

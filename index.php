@@ -59,6 +59,7 @@
 							<button class="rename">Rename</button>
 							<button class="remove">Delete</button>
 							<button class="link">Link</button>
+							<button class="orphan">Find Orphan</button>
 							<br />
 							<textarea class="reason">Give a reason and click a colour</textarea>
 							<br />
