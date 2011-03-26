@@ -39,7 +39,7 @@ body { height: 100%; margin: 0px; padding: 0px }
 
 #tools {
 	float: right;
-	width: 26%;
+	width: 28%;
 	margin: 0 0 0 0;
 	display: inline;
 }
@@ -49,6 +49,10 @@ button.inprogress{
 }
 
 textarea.reason {
+	width: 90%;
+}
+
+select {
 	width: 90%;
 }
 

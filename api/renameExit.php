@@ -25,24 +25,29 @@ if( ( (!isset($_GET['new'])) || ($new == "") ) && (!$deleting) ){
 $exit = simplexml_load_file($file);
 
 foreach($exit->zones->zone as $zone){
-	//rename me within my linked zones
-	$zfile = "{$settings['data_dir']}/" . str_replace("'","^",$zone['title']) . ".zone";
-	$zxml  = simplexml_load_file($zfile);
-	foreach($zxml->exits->exit as $e){
-		if($e['title']==$title){
-			if($deleting){
-				$d=dom_import_simplexml($e);
-				$d->parentNode->removeChild($d);
-			}else{
-				$e['title'] = $new;
+	if($zone['title']!=""){
+		//rename me within my linked zones
+		$zfile = "{$settings['data_dir']}/" . str_replace("'","^",$zone['title']) . ".zone";
+		$zxml  = simplexml_load_file($zfile);
+		foreach($zxml->exits->exit as $e){
+			if($e['title']==$title){
+				if($deleting){
+					$d=dom_import_simplexml($e);
+					$d->parentNode->removeChild($d);
+				}else{
+					$e['title'] = $new;
+				}
 			}
 		}
+		$zdom = new DOMDocument('1.0');
+		$zdom->preserveWhiteSpace = false;
+		$zdom->formatOutput = true;
+		$zdom->loadXML($zxml->asXML());
+		file_put_contents($zfile,$zdom->saveXML());
+	}else{
+		$d=dom_import_simplexml($zone);
+		$d->parentNode->removeChild($d);
 	}
-	$zdom = new DOMDocument('1.0');
-	$zdom->preserveWhiteSpace = false;
-	$zdom->formatOutput = true;
-	$zdom->loadXML($zxml->asXML());
-	file_put_contents($zfile,$zdom->saveXML());
 }
 
 if($deleting){
