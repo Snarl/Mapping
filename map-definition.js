@@ -253,7 +253,7 @@ function Zone(){
 	};
 	
 	this.remove = function(){
-		$.get("api/removeZone.php", {id: this.title});
+		$.get("api/removeZone.php", {id: this.title, del: "true"});
 		this.finishEdit();
 		this.shape.setMap(null);
 		delete this.shape;
@@ -547,7 +547,7 @@ function Exit(){
 	};
 	
 	this.remove = function(){
-		$.get("api/removeExit.php", {id: this.title});
+		$.get("api/renameExit.php", {id: this.title, del: "true});
 		this.finishEdit();
 		this.shape.setMap(null);
 		delete this.shape;
