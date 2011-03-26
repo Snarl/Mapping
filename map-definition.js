@@ -253,7 +253,7 @@ function Zone(){
 	};
 	
 	this.remove = function(){
-		$.get("api/renameZone.php", {id: this.title, del: "true"});
+		$.get("api/renameZone.php", {title: this.title, del: "true"});
 		this.finishEdit();
 		this.shape.setMap(null);
 		delete this.shape;
@@ -345,7 +345,6 @@ function Exit(){
 	}
 	
 	this.setTitle = function(t){
-		this.title = t;
 		if(this.title!="untitled exit"){
 			$.get("api/renameExit.php", {
 				title: this.title,
@@ -547,7 +546,7 @@ function Exit(){
 	};
 	
 	this.remove = function(){
-		$.get("api/renameExit.php", {id: this.title, del: "true});
+		$.get("api/renameExit.php", {title: this.title, del: "true" });
 		this.finishEdit();
 		this.shape.setMap(null);
 		delete this.shape;
@@ -676,7 +675,7 @@ $(document).ready(function(){
 	map = new google.maps.Map($map[0], {
 		zoom: 16,
 		center: new google.maps.LatLng(51.500556, -0.126667),
-		mapTypeId: google.maps.MapTypeId.ROADMAP
+		mapTypeId: google.maps.MapTypeId.HYBRID
 	});
 	
 	$('textarea.reason').focus(function(){
@@ -744,7 +743,7 @@ $(document).ready(function(){
 		);
 		
 		$('#zoneoptions button.rename').click(function(){
-			var tnew = prompt("New title");
+			var tnew = prompt("Provide a new title for "+zones[$zoneid.val()].getTitle());
 			if(tnew == null){
 				return false;
 			}
@@ -822,6 +821,14 @@ $(document).ready(function(){
 				$(this).text("Edit");
 			}
 		);
+		
+		$('#exitoptions button.rename').click(function(){
+			var tnew = prompt("Provide a new title for "+exits[$exitid.val()].getTitle());
+			if(tnew == null){
+				return false;
+			}
+			exits[$exitid.val()].setTitle(tnew);
+		});
 		
 		$('#exitoptions button.remove').click(function(){
 			exits[$exitid.val()].remove();
