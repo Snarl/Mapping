@@ -182,8 +182,9 @@ function Zone(){
 					exit.removeLink(this.title);
 					this.blendTo(colours['norm']);
 				}else{
-					exit.addLink(this.title);
-					this.blendTo(colours['high']);
+					if(exit.addLink(this.title)){
+						this.blendTo(colours['high']);
+					}
 				}
 				break;
 			case "select":
@@ -596,7 +597,12 @@ function Exit(){
 	}
 	
 	this.addLink = function(zone){
-		this.links.push(zone);	
+		if(this.links.length<2){
+			this.links.push(zone);	
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 	this.removeLink = function(zone){
