@@ -1,11 +1,15 @@
-<!DOCTYPE html>
+<?php
+
+require("./api/config.php");
+
+?><!DOCTYPE html>
 <html>
 
 	<head>
 
 		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 
-		<base href="/maps/" />
+		<base href="<?php echo $settings['base']; ?>" />
 
 		<link rel="stylesheet" href="style.css" type="text/css" />
 
