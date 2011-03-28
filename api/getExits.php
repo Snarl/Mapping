@@ -20,6 +20,10 @@
 		$exits[$arr['title']] = $arr;
 	}
 	
-	echo(json_encode($exits));
+	$response = json_encode($exits);
+	
+	header("Content-Length: ".strlen($response));
+	
+	echo($response);
 
 ?>
