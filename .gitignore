@@ -1,5 +1,1 @@
-/poly
-/data/*.exit
-/data/*.zone
-/data/deleted/*.exit
-/data/deleted/*.zone
+/data/
