@@ -1,6 +1,6 @@
 <?php
 
-$settings['base']     = "/maps26/"
+$settings['base']     = "/maps26/";
 $settings['base_dir'] = "/home/sukey/public_html/maps26";
 $settings['data_dir'] = $settings['base_dir'] . "/data";
 
