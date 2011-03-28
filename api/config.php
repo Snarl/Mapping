@@ -1,7 +1,7 @@
 <?php
 
-$settings['base']     = "/maps26/";
-$settings['base_dir'] = "/home/sukey/public_html/maps26";
+$settings['base']     = "/maps/";
+$settings['base_dir'] = "/var/www/maps";
 $settings['data_dir'] = $settings['base_dir'] . "/data";
 
 function callAPI($call){

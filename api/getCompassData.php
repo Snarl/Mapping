@@ -8,7 +8,7 @@
 include ('config.php');
 include ('xml2array.php');
 
-if(!isset($_GET['loc'])){
+if(empty($_GET['loc'])){
 	die("No location supplied");
 }
 
@@ -17,7 +17,7 @@ $location = explode(',',$_GET['loc']);
 $lat = floatval($location[0]);
 $lng = floatval($location[1]);
 
-if( (!isset($_GET['zone'])) || ($_GET['zone']=="") ){
+if( empty($_GET['zone']) ){
 	$call = "getZoneFromPoint.php?point={$lat},{$lng}";
 	$zone = callAPI($call);
 }else{

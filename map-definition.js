@@ -29,7 +29,8 @@ function Zone(){
 	}
 
 	this.rename = function(t){
-		$.get("api/renameZone.php", {
+		$.get("api/rename.php", {
+			type: 'zone',
 			title: this.getTitle(),
 			new: t
 		});
@@ -256,7 +257,11 @@ function Zone(){
 	};
 	
 	this.remove = function(){
-		$.get("api/renameZone.php", {title: this.title, del: "true"});
+		$.get("api/rename.php", { 
+			type: "zone", 
+			title: this.title, 
+			del: "true"
+		});
 		this.finishEdit();
 		this.shape.setMap(null);
 		delete this.shape;
@@ -273,7 +278,8 @@ function Zone(){
 	this.setStatus = function(status,reason){
 		this.status = status;
 		this.reason = reason;
-		$.get("api/saveZoneStatus.php", {
+		$.get("api/saveStatus.php", {
+			type: "zone",
 			title: this.title,
 			status: status,
 			reason: reason
@@ -354,7 +360,8 @@ function Exit(){
 	}
 
 	this.rename = function(t){
-		$.get("api/renameExit.php", {
+		$.get("api/rename.php", {
+			type: "exit",
 			title: this.getTitle(),
 			new: t
 		});
@@ -554,7 +561,11 @@ function Exit(){
 	};
 	
 	this.remove = function(){
-		$.get("api/renameExit.php", {title: this.title, del: "true" });
+		$.get("api/rename.php", {
+			type: "exit",
+			title: this.title, 
+			del: "true" 
+		});
 		this.finishEdit();
 		this.shape.setMap(null);
 		delete this.shape;
@@ -571,7 +582,8 @@ function Exit(){
 	this.setStatus = function(status,reason){
 		this.status = status;
 		this.reason = reason;
-		$.get("api/saveExitStatus.php", {
+		$.get("api/saveStatus.php", {
+			type: "exit",
 			title: this.title,
 			status: status,
 			reason: reason
