@@ -25,15 +25,17 @@ function Zone(){
 	}
 	
 	this.setTitle = function(t){
-		if(this.title!="untitled zone"){
-			$.get("api/renameZone.php", {
-				title: this.title,
-				new: t
-			});
-			var pos = this.getIndex()+1;
-			$('#zonelist option:eq('+pos+')').text(t);
-		}
 		this.title = t;
+	}
+
+	this.rename = function(t){
+		$.get("api/renameZone.php", {
+			title: this.getTitle(),
+			new: t
+		});
+		var pos = this.getIndex()+1;
+		$('#zonelist option:eq('+pos+')').text(t);
+		this.setTitle(t);	
 	}
 
 	this.addPoint = function(pos) {
@@ -213,12 +215,12 @@ function Zone(){
 			this.markers[n].setDraggable(false);
 			this.markers[n].setVisible(false);
 		}
-		if(prim!==true){
+		if(prim!=true){
 			zoneclick = "select";
 			google.maps.event.clearListeners(map,"click");
 			//google.maps.event.removeListener(map_click);
+			this.blendTo(colours['high']);
 		}
-		this.blendTo(colours['high']);
 	};
 
 	this.startEdit = function() {
@@ -290,6 +292,7 @@ function Zone(){
 
 function loadZones(){
 	$.getJSON("api/getZones.php",function(data){
+		var t = 0;
 		$.each(data, function(k, v){
 			// Create Zone object
 			zone = createZone(k);
@@ -319,9 +322,10 @@ function createZone(title){
 	zone.setTitle(title);
 	zones.push(zone);
 	// Add to list
-	$('#zonelist').append("<option value='"+(zones.length-1)+"'>"+title+"</option>").val(zones.length-1).change();
+	$('#zonelist').append("<option value='"+(zones.length-1)+"'>"+title+"</option>");
 	
 	if(click){
+		$('#zonelist').val(zones.length-1).change();
 		$('#zoneoptions button.edit').click();
 	}
 	
@@ -346,15 +350,17 @@ function Exit(){
 	}
 	
 	this.setTitle = function(t){
-		if(this.title!="untitled exit"){
-			$.get("api/renameExit.php", {
-				title: this.title,
-				new: t
-			});
-			var pos = this.getIndex()+1;
-			$('#exitlist option:eq('+pos+')').text(t);
-		}
 		this.title = t;
+	}
+
+	this.rename = function(t){
+		$.get("api/renameExit.php", {
+			title: this.getTitle(),
+			new: t
+		});
+		var pos = this.getIndex()+1;
+		$('#exitlist option:eq('+pos+')').text(t);
+		this.setTitle(t);	
 	}
 	
 	this.blendTo = function(to_string, time){
@@ -510,7 +516,7 @@ function Exit(){
 			this.markers[n].setDraggable(false);
 			this.markers[n].setVisible(false);
 		}
-		if(prim!==true){
+		if(prim!=true){
 			google.maps.event.clearListeners(map,"click");
 			//google.maps.event.removeListener(map_click);
 		}
@@ -634,12 +640,18 @@ function loadExits(){
 			// Create exit object
 			exit = createExit(k);
 			nodes = v.nodes.node;
-			for(var i = 0;i < nodes.length;i++){
-				exit.addPoint(new google.maps.LatLng(nodes[i].lat, nodes[i].lng));
+			if(nodes===undefined){
+				console.log("k has no nodes");
+			}else{
+				for(var i = 0;i < nodes.length;i++){
+					exit.addPoint(new google.maps.LatLng(nodes[i].lat, nodes[i].lng));
+				}
 			}
 			links = v.zones.zone;
-			for(var i = 0;i < links.length;i++){
-				exit.addLink(links[i].title);
+			if(links!==undefined){
+				for(var i = 0;i < links.length;i++){
+					exit.addLink(links[i].title);
+				}
 			}
 			//exit.refreshStatus();
 			exit.finishEdit(true);
@@ -648,7 +660,6 @@ function loadExits(){
 }
 
 function createExit(title){
-	
 	var click = false;
 	if(title===undefined){
 		click = true;
@@ -663,15 +674,15 @@ function createExit(title){
 	exit.setTitle(title);
 	exits.push(exit);
 	// Add to list
-	$('#exitlist').append("<option value='"+(exits.length-1)+"'>"+title+"</option>").val(exits.length-1).change();
+	$('#exitlist').append("<option value='"+(exits.length-1)+"'>"+title+"</option>");
 	
 	if(click){
+		$('#exitlist').val(exits.length-1).change();
 		$('#exitoptions button.edit').click();
 	}
 	
 	return exits[exits.length-1];
 
-	
 }
 
 $(document).ready(function(){
@@ -754,7 +765,7 @@ $(document).ready(function(){
 			if(tnew == null){
 				return false;
 			}
-			zones[$zoneid.val()].setTitle(tnew);
+			zones[$zoneid.val()].rename(tnew);
 		});
 		
 		$('#zoneoptions button.remove').click(function(){
@@ -834,7 +845,7 @@ $(document).ready(function(){
 			if(tnew == null){
 				return false;
 			}
-			exits[$exitid.val()].setTitle(tnew);
+			exits[$exitid.val()].rename(tnew);
 		});
 		
 		$('#exitoptions button.remove').click(function(){
