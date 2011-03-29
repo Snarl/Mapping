@@ -245,7 +245,8 @@ function Zone(){
 			pos.push(this.markers[i].getPosition().toUrlValue(14));
 		}
 
-		$.get("api/saveZone.php", {
+		$.get("api/save.php", {
+			"type" : "zone",
 			"title": this.title,
 			"nodes": encodeURI(pos.join(';'))
 		}, function(result){
@@ -552,7 +553,8 @@ function Exit(){
 			pos.push(this.markers[i].getPosition().toUrlValue(14));
 		}
 
-		$.get("api/saveExit.php", {
+		$.get("api/save.php", {
+			"type": "exit",
 			"title": this.title,
 			"nodes": encodeURI(pos.join(';')),
 			"links": this.links.join(';')
