@@ -47,12 +47,16 @@ if(!file_exists($file)){
 if(!empty($links)){
 	//Add list of links
 	if( empty($append) || ($append==false) ){
-		$d=dom_import_simplexml($xml->xpath("//{$type}/{$other}s/{$other}"));
-		$d->parentNode->removeChild($d);
+		$old = $xml->xpath("//{$type}/{$other}s/{$other}");
+		foreach($old as $oldlink){
+			$d=dom_import_simplexml($oldlink);
+			$d->parentNode->removeChild($d);
+		}
 	}
 	$links = explode(";",$links);
+	$others = $xml->xpath("//{$type}/{$other}s");
 	foreach($links as $link){
-		$child = $zone->xpath("//{$type}/{$other}s")->addChild($other);
+		$child = $others[0]->addChild($other);
 		$child->addAttribute("title",$link);
 		//then add this exit to that zone
 		if( empty($int) || ($int==false) ){

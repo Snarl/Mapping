@@ -888,21 +888,6 @@ $(document).ready(function(){
 				$(this).text("Link");
 			}
 		);
-		
-		$('#exitoptions button.orphan').click(function(){
-			var change = false;
-			$.each(exits,function(k,v){
-				if(v.links.length < 2){
-					$exitlist.val(k).change();
-					v.zoomTo();
-					change = true;
-					return false;
-				}
-			});
-			if(!change){
-				alert("No orphans! You clever boy/girl");
-			}
-		});
 
 		$('#exitoptions button.red, #exitoptions button.orange, #exitoptions button.green').click(function(){
 			var $this = $(this);
@@ -915,5 +900,22 @@ $(document).ready(function(){
 			exits[$exitid.val()].setStatus(status,reason);
 			$reason.val($reason[0].defaultValue);
 		});
+		
+	//Other tools
+	
+	$('#orphan').click(function(){
+		var change = false;
+		$.each(exits,function(k,v){
+			if(v.links.length < 2){
+				$exitlist.val(k).change();
+				v.zoomTo();
+				change = true;
+				return false;
+			}
+		});
+		if(!change){
+			alert("No orphans! You clever boy/girl");
+		}
+	});
 		
 });

@@ -63,7 +63,6 @@ require("./api/config.php");
 							<button class="rename">Rename</button>
 							<button class="remove">Delete</button>
 							<button class="link">Link</button>
-							<button class="orphan">Find Orphan</button>
 							<br />
 							<textarea class="reason">Give a reason and click a colour</textarea>
 							<br />
@@ -71,6 +70,8 @@ require("./api/config.php");
 							<button class="orange"></button> 
 							<button class="green"></button>
 						</div>
+					<h4>Other</h4>
+						<button id="orphan">Find Orphaned Exit</button>
 				</div>
 			</div>
 		</div>
