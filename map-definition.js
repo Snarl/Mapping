@@ -297,19 +297,23 @@ function Zone(){
 }
 
 function loadZones(){
-	$.getJSON("api/getZones.php",function(data){
-		var t = 0;
-		$.each(data, function(k, v){
-			// Create Zone object
-			zone = createZone(k);
-			nodes = v.nodes.node;
-			for(var i = 0;i < nodes.length;i++){
-				zone.addPoint(new google.maps.LatLng(nodes[i].lat, nodes[i].lng));
-			}
-			//zone.refreshStatus();
-			zone.finishEdit(true);
-		});
-	});
+	$.getJSON(
+		"api/get.php", {
+			type: "zone"
+		}, function(data){
+			var t = 0;
+			$.each(data, function(k, v){
+				// Create Zone object
+				zone = createZone(k);
+				nodes = v.nodes.node;
+				for(var i = 0;i < nodes.length;i++){
+					zone.addPoint(new google.maps.LatLng(nodes[i].lat, nodes[i].lng));
+				}
+				//zone.refreshStatus();
+				zone.finishEdit(true);
+			});
+		}
+	);
 }
 
 function createZone(title){
@@ -647,28 +651,32 @@ function Exit(){
 }
 
 function loadExits(){
-	$.getJSON("api/getExits.php",function(data){
-		$.each(data, function(k, v){
-			// Create exit object
-			exit = createExit(k);
-			nodes = v.nodes.node;
-			if(nodes===undefined){
-				console.log("k has no nodes");
-			}else{
-				for(var i = 0;i < nodes.length;i++){
-					exit.addPoint(new google.maps.LatLng(nodes[i].lat, nodes[i].lng));
+	$.getJSON(
+		"api/get.php", {
+			type: "exit"
+		}, function(data){
+			$.each(data, function(k, v){
+				// Create exit object
+				exit = createExit(k);
+				nodes = v.nodes.node;
+				if(nodes===undefined){
+					console.log("k has no nodes");
+				}else{
+					for(var i = 0;i < nodes.length;i++){
+						exit.addPoint(new google.maps.LatLng(nodes[i].lat, nodes[i].lng));
+					}
 				}
-			}
-			links = v.zones.zone;
-			if(links!==undefined){
-				for(var i = 0;i < links.length;i++){
-					exit.addLink(links[i].title);
+				links = v.zones.zone;
+				if(links!==undefined){
+					for(var i = 0;i < links.length;i++){
+						exit.addLink(links[i].title);
+					}
 				}
-			}
-			//exit.refreshStatus();
-			exit.finishEdit(true);
-		});
-	});
+				//exit.refreshStatus();
+				exit.finishEdit(true);
+			});
+		}
+	);
 }
 
 function createExit(title){
