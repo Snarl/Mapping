@@ -1,8 +1,17 @@
 <?php
 
-$settings['base']     = "/maps/";
-$settings['base_dir'] = "/var/www/maps";
+/*--------------------------
+Configuration - Sukey Mapping API
+---------------------------*/
+
+// This is for the base URL, so that we know where to reference any includes done on the client side
+$settings['base']     = "/base_url/";
+// This is the absolute server path to base directory
+$settings['base_dir'] = "/path/to/mapping";
+// This is the absolute server path to the data directory
 $settings['data_dir'] = $settings['base_dir'] . "/data";
+
+// DO NOT CHANGE ANYTHING BELOW THIS LINE
 
 function callAPI($call){
 	$url = 'http';
