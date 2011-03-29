@@ -1,10 +1,10 @@
 <?php
 
-// Title: getExits.php
-// Description: Get a list of exits served as JSON
+// Title: get.php
+// Description: Get a list of requested datatype served as JSON
 // Author: Samuel Gaus
 // Args: 
-// 		type = zone|exit
+// 		type = String(zone|exit)
 
 	require("config.php");
 
