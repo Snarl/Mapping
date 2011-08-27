@@ -9,8 +9,6 @@ require("./api/config.php");
 
 		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 
-		<base href="<?php echo $settings['base']; ?>" />
-
 		<link rel="stylesheet" href="style.css" type="text/css" />
 
 		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
@@ -23,7 +21,7 @@ require("./api/config.php");
 
 		<div id="container">
 			<div id="header">
-				<h1>Snarl</h1>
+				<h1>Mapping</h1>
 			</div>
 			<div id="content">
 				<div id="map-container">

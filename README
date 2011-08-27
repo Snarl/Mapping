@@ -1,0 +1,9 @@
+Howto Deploy Mapping
+====================
+on the remote server:
+git clone git@github.com:Snarl/Mapping.git
+cd Mapping
+pwd (copy the output of pwd and save for next step)
+cd api
+vi config.php
+change the 'base' variable to text grabbed from previous step
