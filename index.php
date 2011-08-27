@@ -10,10 +10,10 @@ require("./api/config.php");
 		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 
 		<link rel="stylesheet" href="style.css" type="text/css" />
-
 		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 		<script type="text/javascript" src="jquery-1.5.1.js"></script>
 		<script type="text/javascript" src="map-definition.js"></script>
+		<title>Snarl: Mapping</title> 
 
 	</head>
 	
@@ -21,7 +21,7 @@ require("./api/config.php");
 
 		<div id="container">
 			<div id="header">
-				<h1>Mapping</h1>
+				<h1>Snarl: Mapping</h1>
 			</div>
 			<div id="content">
 				<div id="map-container">
