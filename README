@@ -1,9 +1,34 @@
-Howto Deploy Mapping
-====================
-on the remote server:
-git clone git@github.com:Snarl/Mapping.git
-cd Mapping
-pwd (copy the output of pwd and save for next step)
-cd api
-vi config.php
-change the 'base' variable to text grabbed from previous step
+Howto Deploy Mapping (using the Git Read-Only url)
+==================================================
+local_username@localmachine:~/$ ssh remote_username@domain.com
+remote_username@domain.com's password:
+[remote_server]$ pwd
+/home/remote_username
+[remote_server]$ ls
+domain.com
+[remote_server]$ cd domain.com/
+[remote_server]$ git clone git://github.com/Snarl/Mapping.git
+Cloning into Mapping...
+remote: Counting objects: 300, done.
+remote: Compressing objects: 100% (114/114), done.
+remote: Total 300 (delta 181), reused 297 (delta 178)
+Receiving objects: 100% (300/300), 114.41 KiB, done.
+Resolving deltas: 100% (181/181), done.
+[remote_server]$ cd Mapping/
+[remote_server]$ ls
+README	api  index.php	jquery-1.5.1.js  m-over-square.png  map-definition.js  square.png  style.css
+[remote_server]$ pwd
+/home/remote_username/domain.com/Mapping
+[remote_server]$ mkdir data
+[remote_server]$ cd api
+[remote_server]$ ls
+config.php.dist  getCompassData.php	  getcolorwheeldata.php  rename.php  saveStatus.php	       xml2array.php
+get.php     getZoneFromPoint.php  index.html		 save.php    updateZoneAndExitKml.php
+[remote_server]$ cp config.php.dist config.php
+[remote_server]$ vi config.php
+press 'i' to go into edit mode in vim
+update line 8:
+$settings['base_dir'] = "/path/to/mapping";
+to
+$settings['base_dir'] = "/home/remote_username/domain.com/Mapping";
+then press 'ESC' key then type :wq to save and exit vim
